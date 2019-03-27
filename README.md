@@ -9,11 +9,23 @@ Secure chat spawned by CSUF's Computer Security course
 
   2) Install npm: `sudo apt install npm`
 
-  3) Clone this repository
-  
+  3) Install the Angular CLI: `sudo npm install -g @angular/cli`
+
+  4) Clone this repository
+
+
+
+## Usage: Angular
+
+  1) `cd my-app`
+
+  2) `ng serve --open`
+
+  2) Go to: `http://localhost:4200/`
+
 
   
-## Usage
+## Usage: Node.js
 
   1) Run the server: `node app.js`
 
@@ -23,4 +35,12 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Help
 
+  Angular: `https://angular.io/guide/quickstart`
+
   Node.js: `https://nodejs.org/en/docs/`
+
+
+
+## Prerequisites
+
+  Node.js 8.x or Node.js 10.x
