@@ -5,6 +5,8 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Setup
 
+  1) Install Express: ``
+
   1) Install Node.js: `sudo apt install nodejs`
 
   2) Install npm: `sudo apt install npm`
@@ -43,4 +45,12 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Prerequisites
 
+  Angular 7
+  
+  Express
+
   Node.js 8.x or Node.js 10.x
+  
+  npm
+  
+  
