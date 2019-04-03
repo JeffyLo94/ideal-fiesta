@@ -5,7 +5,7 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Setup
 
-  1) Install Express: ``
+  1) Install Express: `sudo npm install express --save`
 
   1) Install Node.js: `sudo apt install nodejs`
 
