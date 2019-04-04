@@ -3,6 +3,12 @@ Secure chat spawned by CSUF's Computer Security course
 
 
 
+## Usage
+
+  `node app.js`
+
+
+
 ## Setup
 
   1) Install Express: `sudo npm install express --save`
