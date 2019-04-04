@@ -19,17 +19,24 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Usage: Angular
 
-  1) `cd my-app`
+  1) `cd myapp-angular/`
 
   2) `ng serve --open`
 
   2) Go to: `http://localhost:4200/`
 
 
+
+## Usage: Express
+
+  1) `cd myapp-express/`
+
+  2) `node app.js`
+
   
 ## Usage: Node.js
 
-  1) Run the server: `node app.js`
+  1) Run the server: `node myapp-nodejs/`
 
   2) Go to: `http://localhost:3000/`
 
