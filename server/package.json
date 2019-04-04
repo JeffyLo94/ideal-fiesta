@@ -1,0 +1,19 @@
+{
+  "name": "ideal-fiesta-server",
+  "version": "1.0.0",
+  "description": "Secure Chat App Server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kernelpop/ideal-fiesta.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kernelpop/ideal-fiesta/issues"
+  },
+  "homepage": "https://github.com/kernelpop/ideal-fiesta#readme"
+}
