@@ -3,13 +3,7 @@ Secure chat spawned by CSUF's Computer Security course
 
 
 
-## Usage
-
-  `node app.js`
-
-
-
-## Setup
+## Setup:
 
   1) Install Node.js: `sudo apt install nodejs`
 
@@ -17,9 +11,9 @@ Secure chat spawned by CSUF's Computer Security course
 
   3) Install Angular CLI: `sudo npm install -g @angular/cli`
 
-  4) Clone this repository
+  4) Download this repository
   
-  5) Install Express: `sudo npm install express --save`
+  5) Install dependencies: `npm install`
 
 
 
@@ -52,5 +46,3 @@ Secure chat spawned by CSUF's Computer Security course
   Node.js 8.x or Node.js 10.x
   
   npm
-  
-  
