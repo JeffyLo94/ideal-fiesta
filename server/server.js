@@ -1,16 +1,56 @@
-const express = require('express');
-const cars = require('cors');
+const cors = require('cors');
+const express = require('express')
+const firebase = require("firebase")
 const http = require('http');
 
 const hostname = '127.0.0.1';
-const port = 3000;
+const app = express()
+const port = 3000
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n');
+require("firebase/firestore"); // Required for side-effects
+
+app.get('/', (req, res) => res.send('Welcome to IdealFiesta!'))
+
+app.listen(port, () => console.log(`IdealFiesta listening on port ${port}!`))
+
+
+// Initialize Cloud Firestore through Firebase
+firebase.initializeApp({
+  apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
+  authDomain: 'ideal-fiesta.firebaseapp.com',
+  projectId: 'ideal-fiesta'
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+var db = firebase.firestore();
+
+db.collection("users").add({
+    first: "Ada",
+    last: "Lovelace",
+    born: 1815
+})
+.then(function(docRef) {
+    console.log("Document written with ID: ", docRef.id);
+})
+.catch(function(error) {
+    console.error("Error adding document: ", error);
+});
+
+// Add a second document with a generated ID.
+db.collection("users").add({
+    first: "Alan",
+    middle: "Mathison",
+    last: "Turing",
+    born: 1912
+})
+.then(function(docRef) {
+    console.log("Document written with ID: ", docRef.id);
+})
+.catch(function(error) {
+    console.error("Error adding document: ", error);
+});
+
+db.collection("users").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data()}`);
+    });
 });
