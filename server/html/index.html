@@ -7,9 +7,14 @@
 		<h1>
 			Welcome to IdealFiesta!
 		</h1>
-		<form>
+		<form action="/send" method="get" id="new_message">
+			To<br>
+			<input type="text" name="to"><br>
 			Message<br>
 			<input type="text" name="message">
 		</form>
+		<button type="submit" form="new_message" value="Submit">
+			Submit
+		</button>
 	</body>
 </html>
