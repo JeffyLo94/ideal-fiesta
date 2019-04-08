@@ -11,52 +11,39 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Setup
 
-  1) Install Express: `sudo npm install express --save`
-
   1) Install Node.js: `sudo apt install nodejs`
 
   2) Install npm: `sudo apt install npm`
 
-  3) Install the Angular CLI: `sudo npm install -g @angular/cli`
+  3) Install Angular CLI: `sudo npm install -g @angular/cli`
 
   4) Clone this repository
+  
+  5) Install Express: `sudo npm install express --save`
 
 
 
-## Usage: Angular
-
-  1) `cd myapp-angular/`
-
-  2) `ng serve --open`
-
-  2) Go to: `http://localhost:4200/`
-
-
-
-## Usage: Express
+## Usage:
 
   1) `cd myapp-express/`
 
   2) `node app.js`
 
-  
-## Usage: Node.js
-
-  1) Run the server: `node myapp-nodejs/`
-
-  2) Go to: `http://localhost:3000/`
+  3) Go to: `http://localhost:3000/`
 
 
 
-## Help
+## Help:
 
   Angular: `https://angular.io/guide/quickstart`
+  
+  Express: `https://expressjs.com/`
 
   Node.js: `https://nodejs.org/en/docs/`
 
 
 
-## Prerequisites
+## Prerequisites:
 
   Angular 7
   
