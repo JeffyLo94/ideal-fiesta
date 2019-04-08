@@ -12,7 +12,7 @@ require("firebase/firestore");
 
 // Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
-  apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
+  apiKey: '',
   authDomain: 'ideal-fiesta.firebaseapp.com',
   projectId: 'ideal-fiesta'
 });
