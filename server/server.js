@@ -2,6 +2,7 @@ const cors = require('cors');
 const express = require('express')
 const firebase = require("firebase")
 const http = require('http');
+const path = require('path')
 
 const hostname = '127.0.0.1';
 const app = express()
@@ -9,10 +10,11 @@ const port = 3000
 
 require("firebase/firestore"); // Required for side-effects
 
-app.get('/', (req, res) => res.send('Welcome to IdealFiesta!'))
+//app.get('/', (req, res) => res.send('Welcome to IdealFiesta!'))
+
+app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/html/index.html')))
 
 app.listen(port, () => console.log(`IdealFiesta listening on port ${port}!`))
-
 
 // Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
