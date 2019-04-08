@@ -19,11 +19,9 @@ Secure chat spawned by CSUF's Computer Security course
 
 ## Usage:
 
-  1) `cd myapp-express/`
+  1) `node app.js`
 
-  2) `node app.js`
-
-  3) Go to: `http://localhost:3000/`
+  2) Go to: `http://localhost:3000/`
 
 
 
