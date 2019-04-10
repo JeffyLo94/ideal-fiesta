@@ -3,7 +3,7 @@
   flex-grow: 0;
   overflow-x: hidden;
   overflow-y: hidden;
-  background-color: #0f1114;
+  background-color: rgba(37,37,37,1);
 }
 
 .split-pane-handle-right {
@@ -15,6 +15,8 @@
   z-index: 1;
   justify-content: center;
   border-right: 1px solid rgba(0,0,0,0);
+  background-color: rgba(64,64,64,1);
+
 }
 
 .split-pane-handle-left {
@@ -26,6 +28,8 @@
   z-index: 1;
   justify-content: center;
   border-left: 1px solid rgba(0,0,0,0);
+  background-color: rgba(64,64,64,1);
+
 }
 
 .split-pane-handle.disabled {

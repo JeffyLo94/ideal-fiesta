@@ -1,0 +1,15 @@
+.chat-pane {
+  height: 100%;
+}
+
+.header {
+  height: 3rem;
+}
+
+.messages {
+  height: calc(100% - 6rem - 7vh);
+}
+
+.textbox {
+  height: 3rem;
+}
