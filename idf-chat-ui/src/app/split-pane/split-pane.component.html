@@ -1,0 +1,15 @@
+<div #container style=' display:flex; overflow-y:hidden; overflow: auto; max-height:100%' [style.height]='height'>
+
+  <span class='split-pane-content' [ngStyle]='{"flex-basis": widthLeft+"px", "max-width": widthLeft+"px", "display":visibleLeft}'>
+  <ng-content select='[pane-left]'></ng-content>
+</span>
+
+  <span #handle style='flex-shrink: 0; flex-grow: 0; overflow-x: hidden' [class]="visiblePane==='right' ? 'split-pane-handle-right' : 'split-pane-handle-left'" [class.disabled]='paneHidden' [ngStyle]='{"flex-basis": widthHandleActual+"px", "max-width": widthHandleActual+"px"}'
+      (mousedown)="downHandle($event)" (window:mouseup)="upHandle($event)" (window:mousemove)="movingHandle($event)">
+  <span class='split-pane-handle-icon'>&#x22ee;</span>
+  </span>
+
+  <span class='split-pane-content' [ngStyle]='{"flex-basis": widthRight+"px", "max-width": widthRight+"px", "display":visibleRight}'>
+  <ng-content select='[pane-right]'></ng-content>
+</span>
+</div>

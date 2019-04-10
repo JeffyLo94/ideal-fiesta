@@ -1,0 +1,40 @@
+.split-pane-content {
+  flex-shrink: 0;
+  flex-grow: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  background-color: #0f1114;
+}
+
+.split-pane-handle-right {
+  /* draggable: true; */
+  cursor: col-resize;
+  user-select: none;
+  box-sizing: border-box;
+  display: flex;
+  z-index: 1;
+  justify-content: center;
+  border-right: 1px solid rgba(0,0,0,0);
+}
+
+.split-pane-handle-left {
+  /* draggable: true; */
+  cursor: col-resize;
+  user-select: none;
+  box-sizing: border-box;
+  display: flex;
+  z-index: 1;
+  justify-content: center;
+  border-left: 1px solid rgba(0,0,0,0);
+}
+
+.split-pane-handle.disabled {
+  /* draggable: false; */
+  cursor: inherit;
+}
+
+.split-pane-handle-icon {
+  align-self: center;
+  opacity: 0.8;
+  user-select: none;
+}

@@ -1,0 +1,23 @@
+<app-header [links]='headerLinks' displayLogo='true'></app-header>
+<app-split-pane
+  [minPaneSizeLeft]='"300"'
+  [maxPaneSize]="['left', 500]"
+  [splitPos]="15" width="100%"
+  [height]='"100%"'
+  [visiblePane]='"both"'>
+    <div
+      class="pane-left"
+      pane-left>
+      <div class="tempTop">
+        <div class="tempHolder">
+          <!-- Chat List Goes Here-->
+        </div>
+      </div>
+      <div class="tempBottom">
+        <!-- App and User Settings Bar Goes Here-->
+      </div>
+    </div>
+    <div pane-right style="flex-basis: inherit">
+      <!-- Chat View Goes Here -->
+    </div>
+</app-split-pane>
