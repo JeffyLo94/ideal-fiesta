@@ -7,8 +7,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomePageComponent implements OnInit {
   headerLinks = [
-    { text: 'Chat', path: 'chat' },
-    { text: 'Temporary', path: '' }
+    // { text: 'Chat', path: 'chat' },
+    { text: 'Login', path: 'login' }
   ];
 
   constructor() { }

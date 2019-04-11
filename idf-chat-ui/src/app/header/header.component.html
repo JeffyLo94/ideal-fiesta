@@ -1,26 +1,30 @@
 <mat-toolbar
   color="primary"
   class="navbar">
-  <a
-    class="plain-link"
-    target="_blank"
-    href="">
-    <div
-      class="link"
-      *ngIf="displayLogo">
-      IDF-SecureChat
-      <!-- Substitute for Logo Here-->
+  <mat-toolbar-row>
+    <div class="logo">
+      <a
+        class="plain-link"
+        target="_blank"
+        href="">
+        <div
+          class="link"
+          *ngIf="displayLogo">
+          IDF-SecureChat
+          <!-- Substitute for Logo Here-->
+        </div>
+      </a>
     </div>
-  </a>
-  <div class="view">
-    {{ view }}
-  </div>
-  <div>
-    <span
-      class="link"
-      *ngFor="let link of links"
-      [routerLink]="link.path">
-      {{ link.text }}
-    </span>
-  </div>
+    <div class="view">
+      {{ view }}
+    </div>
+    <div class="page-links">
+      <span
+        class="link"
+        *ngFor="let link of links"
+        [routerLink]="link.path">
+        {{ link.text }}
+      </span>
+    </div>
+  </mat-toolbar-row>
 </mat-toolbar>
