@@ -7,6 +7,16 @@ mat-toolbar {
   justify-content: flex-start;
 }
 
+.logo {
+  max-width: 15%;
+}
+
+.page-links {
+  display: flex;
+  justify-content: flex-end;
+  width: 70%;
+}
+
 .link {
   margin-right: 1rem;
   outline: 0;
@@ -23,4 +33,5 @@ mat-toolbar {
 
 .view {
   margin-left: 3rem;
+  width: 15%;
 }

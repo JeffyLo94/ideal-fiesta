@@ -2,9 +2,22 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
+// Material
+import { MatToolbarModule,
+  MatListModule,
+  MatCardModule,
+  MatButtonModule,
+  MatLabel,
+  MatFormFieldModule,
+  MatInputModule
+} from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { MatToolbarModule, MatListModule, MatCardModule, MatButtonModule } from '@angular/material';
+// Firebase
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 
+// App
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SplitPaneComponent } from './split-pane/split-pane.component';
@@ -15,6 +28,17 @@ import { ChatPaneViewComponent } from './chat-pane-view/chat-pane-view.component
 import { ChatHeaderComponent } from './chat-pane-view/chat-header/chat-header.component';
 import { ChatMessagesViewComponent } from './chat-pane-view/chat-messages-view/chat-messages-view.component';
 import { ChatBoxFieldComponent } from './chat-pane-view/chat-box-field/chat-box-field.component';
+import { LoginComponent } from './login/login.component';
+
+
+let fbconfig = {
+  apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
+  authDomain: 'ideal-fiesta.firebaseapp.com',
+  databaseURL: 'https://ideal-fiesta.firebaseio.com',
+  projectId: 'ideal-fiesta',
+  storageBucket: 'ideal-fiesta.appspot.com',
+  messagingSenderId: '344869506367'
+};
 
 @NgModule({
   declarations: [
@@ -26,16 +50,22 @@ import { ChatBoxFieldComponent } from './chat-pane-view/chat-box-field/chat-box-
     ChatPaneViewComponent,
     ChatHeaderComponent,
     ChatMessagesViewComponent,
-    ChatBoxFieldComponent
+    ChatBoxFieldComponent,
+    LoginComponent
   ],
   imports: [
+    AngularFireModule.initializeApp(fbconfig),
+    AngularFireAuthModule,
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     FlexLayoutModule,
     MatToolbarModule,
     MatListModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]
