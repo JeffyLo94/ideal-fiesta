@@ -43,9 +43,6 @@ app.get('/send', (request, response) => {
     request.query.message
   )
 
-  // Log all messages in the database
-  logAllMessages()
-
   // Send the user back home
   response.sendFile(path.join(__dirname+'/html/home.html'))
 })
@@ -62,6 +59,9 @@ function sendMessage(to,message) {
   .catch(function(error) {
       console.error("Error posting message: ", error);
   });
+
+  // Log all messages in the database
+  logAllMessages()
 }
 
 // Log all messages in our database
@@ -69,7 +69,6 @@ function logAllMessages() {
   console.log(`All system messages:`)
   db.collection("messages").get().then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-          //console.log(`${doc.id} => ${doc.data().born}`);
           console.log(`\tMessage ID: ${doc.id}`);
           console.log(`\t\tTo: ${doc.data().To}`);
           console.log(`\t\tMessage: ${doc.data().Message}`);
