@@ -19,12 +19,17 @@ firebase.initializeApp({
 
 var db = firebase.firestore();
 
-app.listen(port, () => console.log(`IdealFiesta is running on port: ${port}!`))
+app.listen(port, () => console.log(`IdealFiesta Chat is running at localhost:${port}`))
 
 // Listen for homepage requests
-app.get('/', (request, response) =>
+app.get('/', (request, response) => {
+
+  // Log all messages in the database
+  logAllMessages()
+
+  // Send the user to our homepage
   response.sendFile(path.join(__dirname+'/html/home.html'))
-)
+})
 
 // Listen for new messages to be sent
 app.get('/send', (request, response) => {
@@ -37,6 +42,9 @@ app.get('/send', (request, response) => {
     request.query.to,
     request.query.message
   )
+
+  // Log all messages in the database
+  logAllMessages()
 
   // Send the user back home
   response.sendFile(path.join(__dirname+'/html/home.html'))
@@ -56,38 +64,16 @@ function sendMessage(to,message) {
   });
 }
 
-/*
-db.collection("users").add({
-    first: "Ada",
-    last: "Lovelace",
-    born: 1815
-})
-.then(function(docRef) {
-    console.log("Document written with ID: ", docRef.id);
-})
-.catch(function(error) {
-    console.error("Error adding document: ", error);
-});
-
-// Add a second document with a generated ID.
-db.collection("users").add({
-    first: "Alan",
-    middle: "Mathison",
-    last: "Turing",
-    born: 1912
-})
-.then(function(docRef) {
-    console.log("Document written with ID: ", docRef.id);
-})
-.catch(function(error) {
-    console.error("Error adding document: ", error);
-});
-*/
-
-// Log everything in our database
-// TODO: Refactor/remove this as it is unecessary
-db.collection("users").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`);
-    });
-});
+// Log all messages in our database
+function logAllMessages() {
+  console.log(`All system messages:`)
+  db.collection("messages").get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+          //console.log(`${doc.id} => ${doc.data().born}`);
+          console.log(`\tMessage ID: ${doc.id}`);
+          console.log(`\t\tTo: ${doc.data().To}`);
+          console.log(`\t\tMessage: ${doc.data().Message}`);
+          console.log(`\t\tRead: ${doc.data().Read}`);
+      });
+  });
+}
