@@ -10,7 +10,7 @@ const port = 3000
 
 require("firebase/firestore"); // Required for side-effects
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/html/index.html')))
+app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/html/home.html')))
 
 app.get('/send', (req, res) => res.sendFile(path.join(__dirname+'/html/send.html')))
 
@@ -25,6 +25,7 @@ firebase.initializeApp({
 
 var db = firebase.firestore();
 
+/*
 db.collection("users").add({
     first: "Ada",
     last: "Lovelace",
@@ -50,6 +51,7 @@ db.collection("users").add({
 .catch(function(error) {
     console.error("Error adding document: ", error);
 });
+*/
 
 db.collection("users").get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {

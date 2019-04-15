@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kernelpop/ideal-fiesta#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "firebase": "^5.9.4"
   }
 }
