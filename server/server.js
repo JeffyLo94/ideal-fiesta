@@ -10,12 +10,6 @@ const port = 3000
 
 require("firebase/firestore"); // Required for side-effects
 
-app.get('/', (req, res) => res.sendFile(path.join(__dirname+'/html/home.html')))
-
-app.get('/send', (req, res) => res.sendFile(path.join(__dirname+'/html/send.html')))
-
-app.listen(port, () => console.log(`IdealFiesta listening on port ${port}!`))
-
 // Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
   apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
@@ -24,6 +18,43 @@ firebase.initializeApp({
 });
 
 var db = firebase.firestore();
+
+app.listen(port, () => console.log(`IdealFiesta is running on port: ${port}!`))
+
+// Listen for homepage requests
+app.get('/', (request, response) =>
+  response.sendFile(path.join(__dirname+'/html/home.html'))
+)
+
+// Listen for new messages to be sent
+app.get('/send', (request, response) => {
+  // Log the information about the message to be sent
+  console.log(request.query.to)
+  console.log(request.query.message)
+
+  // Send the message
+  sendMessage(
+    request.query.to,
+    request.query.message
+  )
+
+  // Send the user back home
+  response.sendFile(path.join(__dirname+'/html/home.html'))
+})
+
+function sendMessage(to,message) {
+  db.collection("messages").add({
+      To: to,
+      Message: message,
+      Read: false
+  })
+  .then(function(docRef) {
+      console.log("Message posted with ID: ", docRef.id);
+  })
+  .catch(function(error) {
+      console.error("Error posting message: ", error);
+  });
+}
 
 /*
 db.collection("users").add({
@@ -53,6 +84,8 @@ db.collection("users").add({
 });
 */
 
+// Log everything in our database
+// TODO: Refactor/remove this as it is unecessary
 db.collection("users").get().then((querySnapshot) => {
     querySnapshot.forEach((doc) => {
         console.log(`${doc.id} => ${doc.data()}`);
