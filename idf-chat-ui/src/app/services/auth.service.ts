@@ -31,7 +31,7 @@ export class AuthService {
     }
   }
 
-  async logout(){
+  async logout() {
     await this.fireAuth.auth.signOut();
     localStorage.removeItem('user');
     this.router.navigate(['login']);

@@ -1,11 +1,33 @@
 .card-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100% - 7vh);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100% - 7vh);
 }
 
 .my-card {
-  margin: auto;
-  vertical-align: middle;
+    margin: auto;
+    vertical-align: middle;
+    width: 50%;
+    max-width: 30vw;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 0px;
+    text-transform: uppercase;
+}
+
+.cardContent {
+    margin-bottom: 0px;
+}
+
+.actions {
+    justify-content: center;
+    display: flex;
+    align-content: center;
+}
+
+.formField {
+    display: block;
 }

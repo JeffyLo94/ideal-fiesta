@@ -29,6 +29,7 @@ import { ChatHeaderComponent } from './chat-pane-view/chat-header/chat-header.co
 import { ChatMessagesViewComponent } from './chat-pane-view/chat-messages-view/chat-messages-view.component';
 import { ChatBoxFieldComponent } from './chat-pane-view/chat-box-field/chat-box-field.component';
 import { LoginComponent } from './login/login.component';
+import { FormsModule } from '@angular/forms';
 
 
 let fbconfig = {
@@ -58,6 +59,7 @@ let fbconfig = {
     AngularFireAuthModule,
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
     AppRoutingModule,
     FlexLayoutModule,
     MatToolbarModule,

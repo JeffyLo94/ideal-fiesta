@@ -7,6 +7,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ChatPageComponent implements OnInit {
 
+  // headerLinks = [
+  //   { text: 'Logout', path: 'passenger' }
+  // ];
+
   constructor() { }
 
   ngOnInit() {

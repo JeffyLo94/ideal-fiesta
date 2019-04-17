@@ -9,7 +9,7 @@ import { HeaderComponent } from './header/header.component';
 const appRoutes: Routes = [
   // TODO: Add Routes as pages added.
   { path: '', component: HomePageComponent },
-  // { path: 'chat', component: ChatPageComponent },
+  { path: 'chat', component: ChatPageComponent },
   { path: 'login', component: LoginComponent}
 ];
 
