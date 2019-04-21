@@ -47,6 +47,11 @@ app.get('/send', (request, response) => {
   response.sendFile(path.join(__dirname+'/html/home.html'))
 })
 
+// 2.0 Generate a public/private key pair
+app.get('/genpair', (request, response) => {
+  
+})
+
 function sendMessage(to,message) {
   db.collection("messages").add({
       To: to,
