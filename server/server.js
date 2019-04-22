@@ -48,8 +48,9 @@ app.get('/send', (request, response) => {
 })
 
 // 2.0 Generate a public/private key pair
-app.get('/genpair', (request, response) => {
-  
+app.post('/genpair', (request, response) => {
+  console.log("Public/private key generation triggered")
+  response.send('POST!');
 })
 
 function sendMessage(to,message) {
