@@ -21,6 +21,7 @@
     "crypto": "^1.0.1",
     "express": "^4.16.4",
     "firebase": "^5.9.4",
+    "keypair": "^1.0.1",
     "node-rsa": "^1.0.5"
   }
 }

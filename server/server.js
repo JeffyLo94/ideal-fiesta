@@ -4,6 +4,8 @@ const firebase = require("firebase")
 const http = require('http');
 const path = require('path')
 
+var keypair = require('keypair');
+
 const hostname = '127.0.0.1';
 const app = express()
 const port = 3000
@@ -50,7 +52,9 @@ app.get('/send', (request, response) => {
 // 2.0 Generate a public/private key pair
 app.post('/genpair', (request, response) => {
   console.log("Public/private key generation triggered")
-  response.send('POST!');
+  var pair = keypair();
+  //console.log(pair);
+  response.send(pair);
 })
 
 function sendMessage(to,message) {
