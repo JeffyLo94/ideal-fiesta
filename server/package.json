@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kernelpop/ideal-fiesta#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.16.4",

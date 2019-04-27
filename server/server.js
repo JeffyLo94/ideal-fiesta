@@ -51,11 +51,18 @@ app.get('/send', (request, response) => {
 
 // 2.0 Generate a public/private key pair
 app.post('/genpair', (request, response) => {
-  console.log("Public/private key generation triggered")
+  var id = request;
+  console.log("/genpair", id);
+
   var pair = keypair();
   //console.log(pair);
   response.send(pair);
 })
+
+// 3.0 Add public key to a document in collection "users"
+function setPublicKey() {
+
+}
 
 function sendMessage(to,message) {
   db.collection("messages").add({
