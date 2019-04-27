@@ -1,18 +1,21 @@
+// David Feinzimer
+// dfeinzimer@csu.fullerton.edu
+
 const cors = require('cors');
 const express = require('express')
 const firebase = require("firebase")
 const http = require('http');
 const path = require('path')
-
 var keypair = require('keypair');
 var bodyParser = require('body-parser')
-
 const hostname = '127.0.0.1';
 const app = express()
 const port = 3000
 
-require("firebase/firestore"); // Required for side-effects
+// Required for side-effects
+require("firebase/firestore");
 
+// For JSON parsing
 app.use(bodyParser.json());
 
 // Initialize Cloud Firestore through Firebase
@@ -22,9 +25,43 @@ firebase.initializeApp({
   projectId: 'ideal-fiesta'
 });
 
+// Get a reference to our database
 var db = firebase.firestore();
 
+// Ran upon server startup
 app.listen(port, () => console.log(`IdealFiesta Chat is running at localhost:${port}`))
+
+// Control flow # 2.0
+//Generate a public/private key pair
+app.post('/genpair', (request, response) => {
+  console.log("/genpair");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid)
+  var pair = keypair();
+  console.log("\tPublic: ", pair.public);
+  console.log("\tPrivate: ", pair.private);
+  setPublicKey(request.body.UID, pair.public)
+  response.send(pair);
+})
+
+// Control flow # 3.0
+//Add public key to a document in collection "users"
+function setPublicKey(UID, publicKey) {
+  console.log("setPublicKey()");
+  console.log("\tUID:", UID);
+  console.log("\tpublicKey:", publicKey);
+  var userRef = db.collection('users').doc(UID);
+  // Set the 'capital' field of the city
+  var updateSingle = userRef.update({public_key: publicKey});
+}
+
+
+// The following is deprecated code.
+// It was largely written for initial testing only.
+// It remains now for reference purposes only.
+// It should be removed before project submission.
+//
+/*
 
 // Listen for homepage requests
 app.get('/', (request, response) => {
@@ -51,22 +88,6 @@ app.get('/send', (request, response) => {
   // Send the user back home
   response.sendFile(path.join(__dirname+'/html/home.html'))
 })
-
-// 2.0 Generate a public/private key pair
-app.post('/genpair', (request, response) => {
-  console.log("/genpair");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid)
-  var pair = keypair();
-  console.log("\tPublic: ", pair.public);
-  console.log("\tPrivate: ", pair.private);
-  response.send(pair);
-})
-
-// 3.0 Add public key to a document in collection "users"
-function setPublicKey() {
-
-}
 
 function sendMessage(to,message) {
   db.collection("messages").add({
@@ -97,3 +118,5 @@ function logAllMessages() {
       });
   });
 }
+
+*/
