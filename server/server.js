@@ -5,12 +5,15 @@ const http = require('http');
 const path = require('path')
 
 var keypair = require('keypair');
+var bodyParser = require('body-parser')
 
 const hostname = '127.0.0.1';
 const app = express()
 const port = 3000
 
 require("firebase/firestore"); // Required for side-effects
+
+app.use(bodyParser.json());
 
 // Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
@@ -51,11 +54,12 @@ app.get('/send', (request, response) => {
 
 // 2.0 Generate a public/private key pair
 app.post('/genpair', (request, response) => {
-  var id = request;
-  console.log("/genpair", id);
-
+  console.log("/genpair");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid)
   var pair = keypair();
-  //console.log(pair);
+  console.log("\tPublic: ", pair.public);
+  console.log("\tPrivate: ", pair.private);
   response.send(pair);
 })
 
