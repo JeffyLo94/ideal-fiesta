@@ -56,7 +56,7 @@ app.post('/genpair', (request, response) => {
   console.log("\tPrivate: ", pair.private);
   setPublicKey(request.body.UID, pair.public)
   response.send(pair);
-})
+});
 
 
 
@@ -88,7 +88,17 @@ app.post('/submitpin', (request, response) => {
   console.log("\tPRIVATE: ", private);
   console.log("\tEncrypted Private: ", encrypted);
   response.send(encrypted);
-})
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 7.0
+Mark a user online
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/setonline', (request, response) => {
+  console.log("/setonline");
+});
 
 
 
