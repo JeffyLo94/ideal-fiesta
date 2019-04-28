@@ -1,4 +1,6 @@
-// David Feinzimer -> dfeinzimer@csu.fullerton.edu
+/*/////////////////////////////////////////////////////////////////////////////
+David Feinzimer -> dfeinzimer@csu.fullerton.edu
+/////////////////////////////////////////////////////////////////////////////*/
 
 
 
@@ -32,7 +34,6 @@ app.listen(port, () => console.log(
 /*/////////////////////////////////////////////////////////////////////////////
 Firebase setup & connection
 /////////////////////////////////////////////////////////////////////////////*/
-// Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
   apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
   authDomain: 'ideal-fiesta.firebaseapp.com',
@@ -42,8 +43,10 @@ var db = firebase.firestore();
 
 
 
-// Control flow # 2.0
-//Generate a public/private key pair
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 2.0
+Generate a public/private key pair
+/////////////////////////////////////////////////////////////////////////////*/
 app.post('/genpair', (request, response) => {
   console.log("/genpair");
   var uid = request.body.UID;
@@ -57,8 +60,10 @@ app.post('/genpair', (request, response) => {
 
 
 
-// Control flow # 3.0
-//Add public key to a document in collection "users"
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 3.0
+Add public key to a document in the "users" collection
+/////////////////////////////////////////////////////////////////////////////*/
 function setPublicKey(UID, publicKey) {
   console.log("setPublicKey()");
   console.log("\tUID:", UID);
@@ -70,8 +75,10 @@ function setPublicKey(UID, publicKey) {
 
 
 
-// Control flow # 4.0 & 5.0
-//Encrypt a user's private key
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 4.0 & 5.0
+Encrypt and return a user's private key
+/////////////////////////////////////////////////////////////////////////////*/
 app.post('/submitpin', (request, response) => {
   console.log("/submitpin");
   var pin     = request.body.PIN;
@@ -85,16 +92,13 @@ app.post('/submitpin', (request, response) => {
 
 
 
-
-
-
-// The following is deprecated code.
-// It was largely written for initial testing only.
-// It remains now for reference purposes only.
-// It should be removed before project submission.
-//
+/*/////////////////////////////////////////////////////////////////////////////
+The following is deprecated code.
+Largely written for initial testing only.
+Remains now for reference purposes only.
+Remove before project submission.
+/////////////////////////////////////////////////////////////////////////////*/
 /*
-
 // Listen for homepage requests
 app.get('/', (request, response) => {
 
