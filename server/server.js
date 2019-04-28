@@ -50,7 +50,7 @@ Generate a public/private key pair
 app.post('/genpair', (request, response) => {
   console.log("/genpair");
   var uid = request.body.UID;
-  console.log("\tUID: ", uid)
+  console.log("\tUID: ", uid);
   var pair = keypair();
   console.log("\tPublic: ", pair.public);
   console.log("\tPrivate: ", pair.private);
@@ -69,7 +69,6 @@ function setPublicKey(UID, publicKey) {
   console.log("\tUID:", UID);
   console.log("\tpublicKey:", publicKey);
   var userRef = db.collection('users').doc(UID);
-  // Set the 'capital' field of the city
   var updateSingle = userRef.update({public_key: publicKey});
 }
 
@@ -98,6 +97,11 @@ Mark a user online
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/setonline', (request, response) => {
   console.log("/setonline");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({status: "online"});
+  response.send("OK");
 });
 
 
