@@ -1,35 +1,46 @@
-// David Feinzimer
-// dfeinzimer@csu.fullerton.edu
+// David Feinzimer -> dfeinzimer@csu.fullerton.edu
 
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Dependencies and important system variables
+/////////////////////////////////////////////////////////////////////////////*/
 const cors = require('cors');
 const express = require('express')
 const firebase = require("firebase")
+const hostname = '127.0.0.1';
 const http = require('http');
 const path = require('path')
-var keypair = require('keypair');
-var bodyParser = require('body-parser')
-const hostname = '127.0.0.1';
-const app = express()
 const port = 3000
-
-// Required for side-effects
 require("firebase/firestore");
+var keypair = require('keypair');
+var bodyParser = require('body-parser');
+var aes256 = require('aes256');
 
-// For JSON parsing
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Express server creation, setup & startup
+/////////////////////////////////////////////////////////////////////////////*/
+const app = express()
 app.use(bodyParser.json());
+app.listen(port, () => console.log(
+    `IdealFiesta Chat is running at localhost:${port}`));
 
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Firebase setup & connection
+/////////////////////////////////////////////////////////////////////////////*/
 // Initialize Cloud Firestore through Firebase
 firebase.initializeApp({
   apiKey: 'AIzaSyB1D7okzUuAH_V2aVVAGH-IinTjCm0QXWU',
   authDomain: 'ideal-fiesta.firebaseapp.com',
   projectId: 'ideal-fiesta'
 });
-
-// Get a reference to our database
 var db = firebase.firestore();
 
-// Ran upon server startup
-app.listen(port, () => console.log(`IdealFiesta Chat is running at localhost:${port}`))
+
 
 // Control flow # 2.0
 //Generate a public/private key pair
@@ -44,6 +55,8 @@ app.post('/genpair', (request, response) => {
   response.send(pair);
 })
 
+
+
 // Control flow # 3.0
 //Add public key to a document in collection "users"
 function setPublicKey(UID, publicKey) {
@@ -54,6 +67,25 @@ function setPublicKey(UID, publicKey) {
   // Set the 'capital' field of the city
   var updateSingle = userRef.update({public_key: publicKey});
 }
+
+
+
+// Control flow # 4.0 & 5.0
+//Encrypt a user's private key
+app.post('/submitpin', (request, response) => {
+  console.log("/submitpin");
+  var pin     = request.body.PIN;
+  var private = request.body.PRIVATE;
+  var encrypted = aes256.encrypt(pin,private);
+  console.log("\tPIN: ", pin);
+  console.log("\tPRIVATE: ", private);
+  console.log("\tEncrypted Private: ", encrypted);
+  response.send(encrypted);
+})
+
+
+
+
 
 
 // The following is deprecated code.
