@@ -1,0 +1,19 @@
+<div
+  class="outer">
+  <div
+    [ngClass]="{ 'new-item': newItem, 'old-item': oldItem }"
+    class="list-item"
+    (click)="onClickImage()">
+
+    <div class="list-item-content">
+      <h3
+        [ngStyle]="{ color: getStatusColor() }">
+        {{ getChatTitle() | uppercase }}
+      </h3>
+      <div class="list-item-time">
+        <span>{{ getLastUpdated() | date:'yyyy-MM-dd'}}</span>
+      </div>
+    </div>
+
+  </div>
+</div>

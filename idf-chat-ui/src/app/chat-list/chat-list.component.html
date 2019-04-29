@@ -1,0 +1,6 @@
+<div class="listStyle">
+  <app-chat-list-item
+    *ngFor="let convo of convos | reverse; trackBy: trackFn"
+    [convos]="convos">
+  </app-chat-list-item>
+</div>

@@ -30,6 +30,8 @@ import { ChatMessagesViewComponent } from './chat-pane-view/chat-messages-view/c
 import { ChatBoxFieldComponent } from './chat-pane-view/chat-box-field/chat-box-field.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule } from '@angular/forms';
+import { ChatListComponent } from './chat-list/chat-list.component';
+import { ChatListItemComponent } from './chat-list/chat-list-item/chat-list-item.component';
 
 
 let fbconfig = {
@@ -52,7 +54,9 @@ let fbconfig = {
     ChatHeaderComponent,
     ChatMessagesViewComponent,
     ChatBoxFieldComponent,
-    LoginComponent
+    LoginComponent,
+    ChatListComponent,
+    ChatListItemComponent
   ],
   imports: [
     AngularFireModule.initializeApp(fbconfig),
