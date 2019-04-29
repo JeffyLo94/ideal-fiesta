@@ -107,6 +107,21 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
+Control flow # 8.0.b. -> 8.4
+Mark a user online
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/newconvo', (request, response) => {
+  console.log("/newconvo");
+  /*var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({status: "online"});*/
+  response.send("OK");
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
 The following is deprecated code.
 Largely written for initial testing only.
 Remains now for reference purposes only.
