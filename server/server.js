@@ -112,10 +112,18 @@ Mark a user online
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
   console.log("/newconvo");
-  /*var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({status: "online"});*/
+  var SenderUID = request.body.SenderUID;
+  var ReceiverUID = request.body.ReceiverUID;
+  var SenderPrivate = request.body.SenderPrivate;
+  var Title = request.body.Title;
+  var Msg = request.body.Msg;
+  console.log("\tSenderUID: ", SenderUID);
+  console.log("\tReceiverUID: ", ReceiverUID);
+  console.log("\tSenderPrivate: ", SenderPrivate);
+  console.log("\tTitle: ", Title);
+  console.log("\tMsg: ", Msg);
+  //var userRef = db.collection('users').doc(uid);
+  //var updateSingle = userRef.update({status: "online"});*/
   response.send("OK");
 });
 
