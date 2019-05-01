@@ -117,13 +117,15 @@ app.post('/newconvo', (request, response) => {
   var SenderPrivate = request.body.SenderPrivate;
   var Title = request.body.Title;
   var Msg = request.body.Msg;
-  console.log("\tSenderUID: ", SenderUID);
-  console.log("\tReceiverUID: ", ReceiverUID);
+  console.log("\tSenderUID:     ", SenderUID);
+  console.log("\tReceiverUID:   ", ReceiverUID);
   console.log("\tSenderPrivate: ", SenderPrivate);
-  console.log("\tTitle: ", Title);
-  console.log("\tMsg: ", Msg);
-  //var userRef = db.collection('users').doc(uid);
-  //var updateSingle = userRef.update({status: "online"});*/
+  console.log("\tTitle:         ", Title);
+  console.log("\tMsg:           ", Msg);
+  Msg = Date.now()+Msg;
+  console.log("\tModified Msg:  ", Msg);
+  var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
+  console.log("\tSenderEMsg:    ", SenderEMsg);
   response.send("OK");
 });
 
