@@ -127,6 +127,10 @@ app.post('/newconvo', (request, response) => {
   var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
   console.log("\tSenderEMsg:    ", SenderEMsg);
   response.send("OK");
+  for(var i = 0; i < ReceiverUID.length; i++) {
+    var obj = ReceiverUID[i];
+    console.log(obj);
+  }
 });
 
 
