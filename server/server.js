@@ -112,31 +112,42 @@ Mark a user online
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
   console.log("/newconvo");
+
+  // Unpackage and document the request
   var SenderUID = request.body.SenderUID;
   var ReceiverUID = request.body.ReceiverUID;
   var SenderPrivate = request.body.SenderPrivate;
   var Title = request.body.Title;
   var Msg = request.body.Msg;
   console.log("\tSenderUID:     ", SenderUID);
-  console.log("\tReceiverUID:   ", ReceiverUID);
-  console.log("\tSenderPrivate: ", SenderPrivate);
+  //console.log("\tReceiverUID:   ", ReceiverUID);
+  //console.log("\tSenderPrivate: ", SenderPrivate);
   console.log("\tTitle:         ", Title);
   console.log("\tMsg:           ", Msg);
+
+  // Perform first encryption layer
   Msg = Date.now()+Msg;
-  console.log("\tModified Msg:  ", Msg);
   var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
-  console.log("\tSenderEMsg:    ", SenderEMsg);
-  response.send("OK");
+  //console.log("\tModified Msg:  ", Msg);
+  //console.log("\tSenderEMsg:    ", SenderEMsg);
+
+  // Gather the public keys of every user in the conversation
   for(var i = 0; i < ReceiverUID.length; i++) {
     var obj = ReceiverUID[i];
-    console.log("\t\tReceivere UID: ",obj);
-    var userRef = db.collection('users').doc(obj);
-    //var updateSingle = userRef.get(public_key);
-    //console.log(updateSingle);
+    console.log("\tReceiver UID: ",obj);
+    db.collection('users').doc(obj).get().then(function(doc) {
+      console.log("Key: ",doc.data().public_key);
+
+      var pin = doc.data().public_key;
+      var private = SenderEMsg;
+      var SenderEEMsg = aes256.encrypt(pin, private);
+
+      console.log("\tSenderEEMsg:",SenderEEMsg);
+
+    });
   }
-  db.collection('users').doc(obj).get().then(function(doc) {
-    console.log(doc.data().public_key);
-  });
+
+  response.send("OK");
 });
 
 
