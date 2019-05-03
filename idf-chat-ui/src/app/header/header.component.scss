@@ -1,5 +1,7 @@
+@import 'variables';
+
 mat-toolbar {
-    height: 7vh;
+    height: $header-height;
 }
 
 .navbar {

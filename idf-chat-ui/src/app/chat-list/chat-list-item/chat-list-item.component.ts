@@ -4,7 +4,7 @@ import { Convos } from 'src/app/chat-objects.model';
 @Component({
   selector: 'app-chat-list-item',
   templateUrl: './chat-list-item.component.html',
-  styleUrls: ['./chat-list-item.component.css']
+  styleUrls: ['./chat-list-item.component.scss']
 })
 export class ChatListItemComponent implements OnInit {
 

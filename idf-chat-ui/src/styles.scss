@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'variables';
+@import '~material-icons/iconfont/material-icons.scss';
+
 
 body {
   padding: 0px;
@@ -14,8 +17,15 @@ body {
 *,
 *::before,
 *::after {
+  font-family: "Roboto", "Helvetica Neue", sans-serif;
   box-sizing: border-box;
 }
+
+// fixes a bug with material-icons having strange overflows and click areas
+.material-icons {
+  overflow: hidden;
+}
+
 
 @font-face {
   font-family: 'Roboto';

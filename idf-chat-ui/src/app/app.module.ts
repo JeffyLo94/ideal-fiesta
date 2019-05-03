@@ -9,7 +9,8 @@ import { MatToolbarModule,
   MatButtonModule,
   MatLabel,
   MatFormFieldModule,
-  MatInputModule
+  MatInputModule,
+  MatIconModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -29,9 +30,12 @@ import { ChatHeaderComponent } from './chat-pane-view/chat-header/chat-header.co
 import { ChatMessagesViewComponent } from './chat-pane-view/chat-messages-view/chat-messages-view.component';
 import { ChatBoxFieldComponent } from './chat-pane-view/chat-box-field/chat-box-field.component';
 import { LoginComponent } from './login/login.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatListComponent } from './chat-list/chat-list.component';
 import { ChatListItemComponent } from './chat-list/chat-list-item/chat-list-item.component';
+import { ReversePipe } from './pipes/reverse.pipe';
+import { AccountCreationComponent } from './account-creation/account-creation.component';
+import { AccountFormComponent } from './account-creation/account-form/account-form.component';
 
 
 let fbconfig = {
@@ -56,7 +60,10 @@ let fbconfig = {
     ChatBoxFieldComponent,
     LoginComponent,
     ChatListComponent,
-    ChatListItemComponent
+    ChatListItemComponent,
+    ReversePipe,
+    AccountCreationComponent,
+    AccountFormComponent
   ],
   imports: [
     AngularFireModule.initializeApp(fbconfig),
@@ -68,10 +75,12 @@ let fbconfig = {
     FlexLayoutModule,
     MatToolbarModule,
     MatListModule,
+    MatIconModule,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

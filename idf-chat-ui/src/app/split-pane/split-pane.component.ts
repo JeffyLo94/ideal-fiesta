@@ -29,7 +29,7 @@ import { Component, Input, ViewChild, ElementRef, HostListener, OnInit, AfterVie
 @Component({
   selector: 'app-split-pane',
   templateUrl: './split-pane.component.html',
-  styleUrls: ['./split-pane.component.css']
+  styleUrls: ['./split-pane.component.scss']
 })
 export class SplitPaneComponent implements OnInit, AfterViewInit, DoCheck {
   @Input() minPaneSizeLeft = 40;
