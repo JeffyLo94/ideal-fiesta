@@ -129,8 +129,14 @@ app.post('/newconvo', (request, response) => {
   response.send("OK");
   for(var i = 0; i < ReceiverUID.length; i++) {
     var obj = ReceiverUID[i];
-    console.log(obj);
+    console.log("\t\tReceivere UID: ",obj);
+    var userRef = db.collection('users').doc(obj);
+    //var updateSingle = userRef.get(public_key);
+    //console.log(updateSingle);
   }
+  db.collection('users').doc(obj).get().then(function(doc) {
+    console.log(doc.data().public_key);
+  });
 });
 
 
