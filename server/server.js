@@ -78,15 +78,18 @@ function setPublicKey(UID, publicKey) {
 Control flow # ???
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
-function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID) {
+function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
   console.log("sendMessage()");
   //console.log("\tSenderEEMsg:", SenderEEMsg);
   console.log("\tcreation_time: ", creation_time);
+  console.log("\tconversation_id: ", conversation_id);
   console.log("\treceiver_uid:  ", ReceiverUID);
   console.log("\tsender_uid:    ", SenderUID);
 
   var messageID;
 
+
+  // Post the message
   db.collection("messages").add({
       sender_ee_msg: SenderEEMsg,
       creation_time: creation_time,
@@ -100,6 +103,20 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID) {
   })
   .catch(function(error) {
       console.error("\tError posting message: ", error);
+  });
+
+  var messageIDS = [];
+
+  // Add the message_id to the conversation
+  db.collection('conversations').doc(conversation_id).get().then(function(doc, messageID) {
+    var message_id_list = doc.data().message_id_list;
+    console.log("message_id_list:");
+    for (var i = 0; i < message_id_list.length; i++) {
+      console.log("\t",message_id_list[i]);
+      messageIDS.push(message_id_list[i]);
+    }
+    //message_id_list = message_id_list.push(messageID);
+    //console.log("All conversation messages:", message_id_list[0]);
   });
 
   return messageID;
@@ -160,31 +177,6 @@ app.post('/newconvo', (request, response) => {
 
   var creation_time = Date.now();
 
-  // Perform first encryption layer
-  Msg = creation_time + Msg;
-  var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
-
-  var messageIDs = [];
-  // Gather the public keys of every user in the conversation
-  for(var i = 0; i < ReceiverUID.length; i++) {
-    //var receiver_uid = ReceiverUID[i];
-    console.log("\treceiver_uid: ",ReceiverUID[i]);
-    db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
-      //console.log("\tsender_public_key: ",doc.data().public_key);
-
-      var pin = doc.data().public_key;
-      var private = SenderEMsg;
-      var SenderEEMsg = aes256.encrypt(pin, private);
-
-      //console.log("\tsender_ee_msg:",SenderEEMsg);
-
-      var receiver = doc.id;
-
-      messageID = sendMessage(SenderEEMsg,creation_time,receiver,SenderUID);
-      messageIDs.push(messageID);
-    });
-  }
-
   var convoID;
   // Make a new conversation object
   db.collection("conversations").add({
@@ -192,16 +184,39 @@ app.post('/newconvo', (request, response) => {
       receiver_uid_list: ReceiverUID,
       creator_uid: SenderUID,
       creation_time: creation_time,
-      message_id_list: messageIDs
+      message_id_list:[],
   })
+  // Upon creation, perform encryption and post the first message.
   .then(function(docRef) {
       convoID = docRef.id;
       console.log("\tConversation posted with ID: ", convoID);
+
+      // Perform first encryption layer
+      Msg = creation_time + Msg;
+      var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
+
+      // Gather the public keys of every user in the conversation
+      for(var i = 0; i < ReceiverUID.length; i++) {
+        //var receiver_uid = ReceiverUID[i];
+        console.log("\treceiver_uid: ",ReceiverUID[i]);
+        db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
+          //console.log("\tsender_public_key: ",doc.data().public_key);
+
+          var pin = doc.data().public_key;
+          var private = SenderEMsg;
+          var SenderEEMsg = aes256.encrypt(pin, private);
+
+          //console.log("\tsender_ee_msg:",SenderEEMsg);
+
+          var receiver = doc.id;
+
+          sendMessage(SenderEEMsg,creation_time,receiver,SenderUID,convoID);
+        });
+      }
   })
   .catch(function(error) {
       console.error("Error posting message: ", error);
   });
-
   response.send(convoID);
 });
 
