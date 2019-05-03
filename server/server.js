@@ -75,7 +75,31 @@ function setPublicKey(UID, publicKey) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Control flow # ???
+Any time a message is sent, add its id to the conversation it belongs to
+/////////////////////////////////////////////////////////////////////////////*/
+function AddMessageToConversation(message_id, conversation_id) {
+    console.log("AddMessageToConversation()");
+    console.log("\tmessage_id:",message_id);
+    console.log("\tconversation_id:",conversation_id);
+    // Create a place to hold message ids already in the conversation
+    var existing_message_id_list = [];
+    db.collection('conversations').doc(conversation_id).get()
+    .then(function(doc, existing_message_id_list) {
+        existing_message_id_list = doc.data().message_id_list;
+        existing_message_id_list.push(message_id);
+        //console.log("existing_message_id_list",existing_message_id_list);
+        var convoRef = db.collection('conversations').doc(conversation_id);
+        convoRef.update({message_id_list: existing_message_id_list});
+    })
+    .catch(function(error) {
+        console.error("\tError adding message to conversation: ", error);
+    });;
+
+}
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
@@ -85,10 +109,8 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
   console.log("\tconversation_id: ", conversation_id);
   console.log("\treceiver_uid:  ", ReceiverUID);
   console.log("\tsender_uid:    ", SenderUID);
-
-  var messageID;
-
-
+  // Create a place to store the message id after it has been created
+  var message_id;
   // Post the message
   db.collection("messages").add({
       sender_ee_msg: SenderEEMsg,
@@ -98,28 +120,15 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
       receiver_read: false
   })
   .then(function(docRef) {
-      messageID = docRef.id;
-      console.log("\tMessage posted. ID: ", messageID);
+      message_id = docRef.id;
+      console.log("\tMessage posted. ID: ", message_id);
+      // Add the new message's id into the conversation it belongs to
+      AddMessageToConversation(message_id,conversation_id);
   })
   .catch(function(error) {
       console.error("\tError posting message: ", error);
   });
-
-  var messageIDS = [];
-
-  // Add the message_id to the conversation
-  db.collection('conversations').doc(conversation_id).get().then(function(doc, messageID) {
-    var message_id_list = doc.data().message_id_list;
-    console.log("message_id_list:");
-    for (var i = 0; i < message_id_list.length; i++) {
-      console.log("\t",message_id_list[i]);
-      messageIDS.push(message_id_list[i]);
-    }
-    //message_id_list = message_id_list.push(messageID);
-    //console.log("All conversation messages:", message_id_list[0]);
-  });
-
-  return messageID;
+  return message_id;
 }
 
 
