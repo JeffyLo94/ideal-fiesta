@@ -80,18 +80,19 @@ Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID) {
   console.log("sendMessage()");
-  console.log("\tSenderEEMsg:", SenderEEMsg);
-  console.log("\tcreation_time:", creation_time);
-  console.log("\tReceiverUID:", ReceiverUID);
-  console.log("\tSenderUID:", SenderUID);
+  //console.log("\tSenderEEMsg:", SenderEEMsg);
+  console.log("\tcreation_time: ", creation_time);
+  console.log("\treceiver_uid:  ", ReceiverUID);
+  console.log("\tsender_uid:    ", SenderUID);
 
   var messageID;
 
   db.collection("messages").add({
-      SenderEEMsg: SenderEEMsg,
+      sender_ee_msg: SenderEEMsg,
       creation_time: creation_time,
-      ReceiverUID: ReceiverUID,
-      SenderUID: SenderUID
+      receiver_uid: ReceiverUID,
+      sender_uid: SenderUID,
+      receiver_read: false
   })
   .then(function(docRef) {
       messageID = docRef.id;
@@ -151,11 +152,11 @@ app.post('/newconvo', (request, response) => {
   var SenderPrivate = request.body.SenderPrivate;
   var Title = request.body.Title;
   var Msg = request.body.Msg;
-  console.log("\tSenderUID:     ", SenderUID);
+  console.log("\tsender_uid:   ", SenderUID);
   //console.log("\tReceiverUID:   ", ReceiverUID);
   //console.log("\tSenderPrivate: ", SenderPrivate);
-  console.log("\tTitle:         ", Title);
-  console.log("\tMsg:           ", Msg);
+  console.log("\ttitle:        ", Title);
+  console.log("\tmsg:          ", Msg);
 
   var creation_time = Date.now();
 
@@ -175,7 +176,7 @@ app.post('/newconvo', (request, response) => {
       var private = SenderEMsg;
       var SenderEEMsg = aes256.encrypt(pin, private);
 
-      console.log("\tsender_ee_msg:",SenderEEMsg);
+      //console.log("\tsender_ee_msg:",SenderEEMsg);
 
       var receiver = doc.id;
 
@@ -188,13 +189,14 @@ app.post('/newconvo', (request, response) => {
   // Make a new conversation object
   db.collection("conversations").add({
       title: Title,
-      ReceiverUID: ReceiverUID,
+      receiver_uid_list: ReceiverUID,
+      creator_uid: SenderUID,
       creation_time: creation_time,
-      messageIDs: messageIDs
+      message_id_list: messageIDs
   })
   .then(function(docRef) {
       convoID = docRef.id;
-      console.log("Conversation posted with ID: ", convoID);
+      console.log("\tConversation posted with ID: ", convoID);
   })
   .catch(function(error) {
       console.error("Error posting message: ", error);
