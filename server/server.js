@@ -75,26 +75,46 @@ function setPublicKey(UID, publicKey) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Any time a message is sent, add its id to the conversation it belongs to
+Anytime a coversation is created add its id to the creator and participants
+/////////////////////////////////////////////////////////////////////////////*/
+function AddConversationToUser(conversation_id,creator_uid,participant_uid) {
+    var fName = "AddConversationToUser()";
+    console.log(fName,"-> conversation_id:",conversation_id);
+    console.log(fName,"-> creator_uid:",creator_uid);
+    console.log(fName,"-> participant_uid:",participant_uid);
+    var existing_convo_id_list = [];
+    db.collection('users').doc(creator_uid).get()
+    .then(function(doc, existing_convo_id_list) {
+        existing_convo_id_list = doc.data().convo_id_list;
+        existing_convo_id_list.push(conversation_id);
+        var Ref = db.collection('users').doc(creator_uid);
+        Ref.update({convo_id_list: existing_convo_id_list});
+    })
+    .catch(function(error) {
+        console.error("\tError adding conversation to creator: ", error);
+    });;
+}
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Anytime a message is sent, add its id to the conversation it belongs to
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
     console.log("AddMessageToConversation()");
     console.log("\tmessage_id:",message_id);
     console.log("\tconversation_id:",conversation_id);
-    // Create a place to hold message ids already in the conversation
     var existing_message_id_list = [];
     db.collection('conversations').doc(conversation_id).get()
     .then(function(doc, existing_message_id_list) {
         existing_message_id_list = doc.data().message_id_list;
         existing_message_id_list.push(message_id);
-        //console.log("existing_message_id_list",existing_message_id_list);
         var convoRef = db.collection('conversations').doc(conversation_id);
         convoRef.update({message_id_list: existing_message_id_list});
     })
     .catch(function(error) {
         console.error("\tError adding message to conversation: ", error);
     });;
-
 }
 
 
