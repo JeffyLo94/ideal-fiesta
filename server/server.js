@@ -108,7 +108,7 @@ app.post('/setonline', (request, response) => {
 
 /*/////////////////////////////////////////////////////////////////////////////
 Control flow # 8.0.b. -> 8.4
-Mark a user online
+Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
   console.log("/newconvo");
