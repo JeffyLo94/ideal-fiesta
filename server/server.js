@@ -294,9 +294,9 @@ app.post('/newuser', (request, response) => {
     .then(function(docRef) {
         user_uid = docRef.id;
         console.log(func_name,"-> SUCCESS: ID:", user_uid);
+        response.send(user_uid);
     })
     .catch(function(error) {
         console.error(func_name,"-> ERROR:", error);
     });
-    response.send(user_uid);
 });
