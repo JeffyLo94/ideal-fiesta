@@ -82,17 +82,22 @@ function AddConversationToUser(conversation_id,user_uid) {
     var func_name = "AddConversationToUser()";
     console.log(func_name,"-> conversation_id:",conversation_id);
     console.log(func_name,"-> user_uid:",user_uid);
-    var existing_list = [];
     db.collection('users').doc(user_uid).get()
-    .then(function(doc,existing_list,conversation_id) {
+    .then(function(doc,conversation_id) {
         // Grab and save all of a user's existing conversations memberships ///
-        for(var x = 0; x < doc.data().conversations.length; x++) {
-            existing_list.push(doc.data().conversations[x]);
+        var temp_list = [];
+        console.log(func_name,"user",user_uid,"has",
+            doc.data().conversations.length,"existing conversations"
+        );
+        if(doc.data().conversations.length > 0) {
+            for(var x = 0; x < doc.data().conversations.length; x++) {
+                temp_list.push(doc.data().conversations[x]);
+            }
         }
         // Add this new conversation to the list //////////////////////////////
-        existing_list.push(conversation_id);
-        var convoRef = db.collection('users').doc(user_uid);
-        convoRef.update({conversations: existing_list});
+        temp_list.push(conversation_id);
+        var user_ref = db.collection("users").doc(user_uid);
+        user_ref.update({conversations: temp_list});
     })
     .catch(function(error) {
         console.error(func_name,
