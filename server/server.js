@@ -98,7 +98,8 @@ function AddConversationToUser(conversation_id,creator_uid,participant_uid) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Anytime a message is sent, add its id to the conversation it belongs to
+Anytime a message is created, we add the new message id to the conversation
+document that it belongs belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
     console.log("AddMessageToConversation()");
