@@ -80,7 +80,6 @@ sender's and recevier's user documents.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddConversationToUser(conversation_id,user_uid) {
     var func_name = "AddConversationToUser()";
-
     console.log(func_name,"-> conversation_id:",conversation_id);
     console.log(func_name,"-> user_uid:",user_uid);
     var existing_list = [];
@@ -107,7 +106,6 @@ document that it belongs belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
     var func_name = "AddMessageToConversation()";
-
     console.log(func_name,"-> message_id:      ",message_id);
     console.log(func_name,"-> conversation_id: ",conversation_id);
     var existing_message_id_list = [];
@@ -129,13 +127,11 @@ function AddMessageToConversation(message_id, conversation_id) {
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
-  var func_name = "sendMessage()";
-
-  //console.log("\tSenderEEMsg:", SenderEEMsg);
-  console.log(func_name,"-> creation_time:   ", creation_time);
-  console.log(func_name,"-> conversation_id: ", conversation_id);
-  console.log(func_name,"-> receiver_uid:    ", ReceiverUID);
-  console.log(func_name,"-> sender_uid:      ", SenderUID);
+  var func_name = "sendMessage() ->";
+  console.log(func_name,"creation_time:",creation_time);
+  console.log(func_name,"conversation_id:", conversation_id);
+  console.log(func_name,"receiver_uid:", ReceiverUID);
+  console.log(func_name,"sender_uid:", SenderUID);
   // Create a place to store the message id after it has been created
   var message_id;
   // Post the message
@@ -148,12 +144,12 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
   })
   .then(function(docRef) {
       message_id = docRef.id;
-      console.log(func_name,"-> SUCCESS: ID:", message_id);
+      console.log(func_name,"SUCCESS: ID:", message_id);
       // Add the new message's id into the conversation it belongs to
       AddMessageToConversation(message_id,conversation_id);
   })
   .catch(function(error) {
-      console.error(func_name,"-> ERROR:", error);
+      console.error(func_name,"ERROR:", error);
   });
   return message_id;
 }
@@ -220,11 +216,9 @@ app.post('/newconvo', (request, response) => {
   var Title = request.body.Title;
   var Msg = request.body.Msg;
   console.log(func_name,"-> sender_uid:", SenderUID);
-  console.log(func_name,"-> title:     ", Title);
-  console.log(func_name,"-> msg:       ", Msg);
-
+  console.log(func_name,"-> title:", Title);
+  console.log(func_name,"-> msg:", Msg);
   var creation_time = Date.now();
-
   var convoID;
   // Make a new conversation object
   db.collection("conversations").add({
@@ -274,70 +268,3 @@ app.post('/newconvo', (request, response) => {
   });
   response.send(convoID);
 });
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-The following is deprecated code.
-Largely written for initial testing only.
-Remains now for reference purposes only.
-Remove before project submission.
-/////////////////////////////////////////////////////////////////////////////*/
-/*
-// Listen for homepage requests
-app.get('/', (request, response) => {
-
-  // Log all messages in the database
-  logAllMessages()
-
-  // Send the user to our homepage
-  response.sendFile(path.join(__dirname+'/html/home.html'))
-})
-
-// Listen for new messages to be sent
-app.get('/send', (request, response) => {
-  // Log the information about the message to be sent
-  console.log(request.query.to)
-  console.log(request.query.message)
-
-  // Send the message
-  sendMessage(
-    request.query.to,
-    request.query.message
-  )
-
-  // Send the user back home
-  response.sendFile(path.join(__dirname+'/html/home.html'))
-})
-
-function sendMessage(to,message) {
-  db.collection("messages").add({
-      To: to,
-      Message: message,
-      Read: false
-  })
-  .then(function(docRef) {
-      console.log("Message posted with ID: ", docRef.id);
-  })
-  .catch(function(error) {
-      console.error("Error posting message: ", error);
-  });
-
-  // Log all messages in the database
-  logAllMessages()
-}
-
-// Log all messages in our database
-function logAllMessages() {
-  console.log(`All system messages:`)
-  db.collection("messages").get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-          console.log(`\tMessage ID: ${doc.id}`);
-          console.log(`\t\tTo: ${doc.data().To}`);
-          console.log(`\t\tMessage: ${doc.data().Message}`);
-          console.log(`\t\tRead: ${doc.data().Read}`);
-      });
-  });
-}
-
-*/
