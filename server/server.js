@@ -79,31 +79,22 @@ Anytime a conversation is created, we add the new conversation id to the
 sender's and recevier's user document.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddConversationToUser(conversation_id,user_uid) {
-    var func_name = "AddConversationToUser()";
-    console.log(func_name,"-> conversation_id:",conversation_id);
-    console.log(func_name,"-> user_uid:",user_uid);
+    var func_name = "AddConversationToUser() ->";
+    console.log(func_name,"conversation_id:",conversation_id);
+    console.log(func_name,"user_uid:",user_uid);
+    var existing_conversation_id_list = [];
     db.collection('users').doc(user_uid).get()
-    .then(function(doc,conversation_id) {
-        // Grab and save all of a user's existing conversations memberships ///
-        var temp_list = [];
+    .then(function(doc, existing_conversation_id_list) {
         console.log(func_name,"user",user_uid,"has",
             doc.data().conversations.length,"existing conversations"
         );
-        if(doc.data().conversations.length > 0) {
-            for(var x = 0; x < doc.data().conversations.length; x++) {
-                temp_list.push(doc.data().conversations[x]);
-            }
-        }
-        // Add this new conversation to the list //////////////////////////////
-        temp_list.push(conversation_id);
-        var user_ref = db.collection("users").doc(user_uid);
-        user_ref.update({conversations: temp_list});
+        existing_conversation_id_list = doc.data().conversations;
+        existing_conversation_id_list.push(conversation_id);
+        var userRef = db.collection('users').doc(user_uid);
+        userRef.update({conversations: existing_conversation_id_list});
     })
     .catch(function(error) {
-        console.error(func_name,
-            "-> ERROR:",
-            error
-        );
+        console.error(func_name,"ERROR:",error);
     });;
 }
 
@@ -120,6 +111,9 @@ function AddMessageToConversation(message_id, conversation_id) {
     var existing_message_id_list = [];
     db.collection('conversations').doc(conversation_id).get()
     .then(function(doc, existing_message_id_list) {
+        console.log(func_name,"conversation",conversation_id,"has",
+            doc.data().message_id_list.length,"existing messages"
+        );
         existing_message_id_list = doc.data().message_id_list;
         existing_message_id_list.push(message_id);
         var convoRef = db.collection('conversations').doc(conversation_id);
