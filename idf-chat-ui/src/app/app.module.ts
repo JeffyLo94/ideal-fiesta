@@ -17,6 +17,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // Firebase
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFirestore } from '@angular/fire/firestore';
+
 
 // App
 import { AppRoutingModule } from './app-routing.module';
@@ -68,6 +71,8 @@ let fbconfig = {
   imports: [
     AngularFireModule.initializeApp(fbconfig),
     AngularFireAuthModule,
+    AngularFireDatabaseModule,
+    AngularFirestore,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
