@@ -75,35 +75,39 @@ function setPublicKey(UID, publicKey) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Anytime a coversation is created add its id to the creator and participants
+Anytime a conversation is created, we add the new conversation id to the
+sender's and recevier's user documents.
 /////////////////////////////////////////////////////////////////////////////*/
-function AddConversationToUser(conversation_id,creator_uid,participant_uid) {
-    var fName = "AddConversationToUser()";
-    console.log(fName,"-> conversation_id:",conversation_id);
-    console.log(fName,"-> creator_uid:",creator_uid);
-    console.log(fName,"-> participant_uid:",participant_uid);
-    var existing_convo_id_list = [];
-    db.collection('users').doc(creator_uid).get()
-    .then(function(doc, existing_convo_id_list) {
-        existing_convo_id_list = doc.data().convo_id_list;
-        existing_convo_id_list.push(conversation_id);
-        var Ref = db.collection('users').doc(creator_uid);
-        Ref.update({convo_id_list: existing_convo_id_list});
+function AddConversationToUser(conversation_id,user_uid) {
+    var func_name = "AddConversationToUser()";
+    console.log(func_name,"-> conversation_id:",conversation_id);
+    console.log(func_name,"-> user_uid:",user_uid);
+    var existing_list = [];
+    db.collection('users').doc(user_uid).get()
+    .then(function(doc, existing_list) {
+        existing_list = doc.data().conversation_id_list;
+        existing_list.push(conversation_id);
+        var convoRef = db.collection('conversations').doc(conversation_id);
+        convoRef.update({conversation_id_list: existing_list});
     })
     .catch(function(error) {
-        console.error("\tError adding conversation to creator: ", error);
+        console.error(func_name,
+            "-> ERROR:",
+            error
+        );
     });;
 }
 
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Anytime a message is sent, add its id to the conversation it belongs to
+Anytime a message is created, we add the new message id to the conversation
+document that it belongs belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
-    console.log("AddMessageToConversation()");
-    console.log("\tmessage_id:",message_id);
-    console.log("\tconversation_id:",conversation_id);
+    var func_name = "AddMessageToConversation()";
+    console.log(func_name,"-> message_id:      ",message_id);
+    console.log(func_name,"-> conversation_id: ",conversation_id);
     var existing_message_id_list = [];
     db.collection('conversations').doc(conversation_id).get()
     .then(function(doc, existing_message_id_list) {
@@ -113,7 +117,7 @@ function AddMessageToConversation(message_id, conversation_id) {
         convoRef.update({message_id_list: existing_message_id_list});
     })
     .catch(function(error) {
-        console.error("\tError adding message to conversation: ", error);
+        console.error(func_name,"-> Error adding message to conversation: ", error);
     });;
 }
 
@@ -123,12 +127,11 @@ function AddMessageToConversation(message_id, conversation_id) {
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
-  console.log("sendMessage()");
-  //console.log("\tSenderEEMsg:", SenderEEMsg);
-  console.log("\tcreation_time: ", creation_time);
-  console.log("\tconversation_id: ", conversation_id);
-  console.log("\treceiver_uid:  ", ReceiverUID);
-  console.log("\tsender_uid:    ", SenderUID);
+  var func_name = "sendMessage() ->";
+  console.log(func_name,"creation_time:",creation_time);
+  console.log(func_name,"conversation_id:", conversation_id);
+  console.log(func_name,"receiver_uid:", ReceiverUID);
+  console.log(func_name,"sender_uid:", SenderUID);
   // Create a place to store the message id after it has been created
   var message_id;
   // Post the message
@@ -141,12 +144,12 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
   })
   .then(function(docRef) {
       message_id = docRef.id;
-      console.log("\tMessage posted. ID: ", message_id);
+      console.log(func_name,"SUCCESS: ID:", message_id);
       // Add the new message's id into the conversation it belongs to
       AddMessageToConversation(message_id,conversation_id);
   })
   .catch(function(error) {
-      console.error("\tError posting message: ", error);
+      console.error(func_name,"ERROR:", error);
   });
   return message_id;
 }
@@ -186,132 +189,81 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Control flow # 8.0.b. -> 8.4
-Starting a new conversation
+Mark a user offline
 /////////////////////////////////////////////////////////////////////////////*/
-app.post('/newconvo', (request, response) => {
-  console.log("/newconvo");
-
-  // Unpackage and document the request
-  var SenderUID = request.body.SenderUID;
-  var ReceiverUID = request.body.ReceiverUID;
-  var SenderPrivate = request.body.SenderPrivate;
-  var Title = request.body.Title;
-  var Msg = request.body.Msg;
-  console.log("\tsender_uid:   ", SenderUID);
-  //console.log("\tReceiverUID:   ", ReceiverUID);
-  //console.log("\tSenderPrivate: ", SenderPrivate);
-  console.log("\ttitle:        ", Title);
-  console.log("\tmsg:          ", Msg);
-
-  var creation_time = Date.now();
-
-  var convoID;
-  // Make a new conversation object
-  db.collection("conversations").add({
-      title: Title,
-      receiver_uid_list: ReceiverUID,
-      creator_uid: SenderUID,
-      creation_time: creation_time,
-      message_id_list:[],
-  })
-  // Upon creation, perform encryption and post the first message.
-  .then(function(docRef) {
-      convoID = docRef.id;
-      console.log("\tConversation posted with ID: ", convoID);
-
-      // Perform first encryption layer
-      Msg = creation_time + Msg;
-      var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
-
-      // Gather the public keys of every user in the conversation
-      for(var i = 0; i < ReceiverUID.length; i++) {
-        //var receiver_uid = ReceiverUID[i];
-        console.log("\treceiver_uid: ",ReceiverUID[i]);
-        db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
-          //console.log("\tsender_public_key: ",doc.data().public_key);
-
-          var pin = doc.data().public_key;
-          var private = SenderEMsg;
-          var SenderEEMsg = aes256.encrypt(pin, private);
-
-          //console.log("\tsender_ee_msg:",SenderEEMsg);
-
-          var receiver = doc.id;
-
-          sendMessage(SenderEEMsg,creation_time,receiver,SenderUID,convoID);
-        });
-      }
-  })
-  .catch(function(error) {
-      console.error("Error posting message: ", error);
-  });
-  response.send(convoID);
+app.post('/setoffline', (request, response) => {
+  console.log("/setoffline");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({status: "offline"});
+  response.send("OK");
 });
 
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-The following is deprecated code.
-Largely written for initial testing only.
-Remains now for reference purposes only.
-Remove before project submission.
+Control flow # 8.0.b. -> 8.4
+Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
-/*
-// Listen for homepage requests
-app.get('/', (request, response) => {
+app.post('/newconvo', (request, response) => {
+    var func_name = "/newconvo";
+    // Unpackage and document the request /////////////////////////////////////
+    var SenderUID = request.body.SenderUID;
+    var ReceiverUID = request.body.ReceiverUID;
+    var SenderPrivate = request.body.SenderPrivate;
+    var Title = request.body.Title;
+    var Msg = request.body.Msg;
+    console.log(func_name,"-> sender_uid:", SenderUID);
+    console.log(func_name,"-> title:", Title);
+    console.log(func_name,"-> msg:", Msg);
+    var creation_time = Date.now();
+    var convoID;
+    // Make a new conversation object /////////////////////////////////////////
+    db.collection("conversations").add({
+        title: Title,
+        receiver_uid_list: ReceiverUID,
+        creator_uid: SenderUID,
+        creation_time: creation_time,
+        message_id_list:[],
+    })
+    // Upon creation, perform encryption and post the first message ///////////
+    .then(function(docRef) {
+        convoID = docRef.id;
+        console.log(func_name,"-> SUCCESS: ID:", convoID);
 
-  // Log all messages in the database
-  logAllMessages()
+        AddConversationToUser(convoID,SenderUID);
 
-  // Send the user to our homepage
-  response.sendFile(path.join(__dirname+'/html/home.html'))
-})
+        // Perform first encryption layer
+        Msg = creation_time + Msg;
+        var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
 
-// Listen for new messages to be sent
-app.get('/send', (request, response) => {
-  // Log the information about the message to be sent
-  console.log(request.query.to)
-  console.log(request.query.message)
+        // Gather the public keys of every user in the conversation
+        for(var i = 0; i < ReceiverUID.length; i++) {
+            //var receiver_uid = ReceiverUID[i];
+            console.log("\treceiver_uid: ",ReceiverUID[i]);
+            db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
+                //console.log("\tsender_public_key: ",doc.data().public_key);
 
-  // Send the message
-  sendMessage(
-    request.query.to,
-    request.query.message
-  )
+                var receiver_uid = doc.id;
 
-  // Send the user back home
-  response.sendFile(path.join(__dirname+'/html/home.html'))
-})
+                AddConversationToUser(convoID,receiver_uid);
 
-function sendMessage(to,message) {
-  db.collection("messages").add({
-      To: to,
-      Message: message,
-      Read: false
-  })
-  .then(function(docRef) {
-      console.log("Message posted with ID: ", docRef.id);
-  })
-  .catch(function(error) {
-      console.error("Error posting message: ", error);
-  });
+                var pin = doc.data().public_key;
+                var private = SenderEMsg;
+                var sender_ee_msg = aes256.encrypt(pin, private);
 
-  // Log all messages in the database
-  logAllMessages()
-}
-
-// Log all messages in our database
-function logAllMessages() {
-  console.log(`All system messages:`)
-  db.collection("messages").get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-          console.log(`\tMessage ID: ${doc.id}`);
-          console.log(`\t\tTo: ${doc.data().To}`);
-          console.log(`\t\tMessage: ${doc.data().Message}`);
-          console.log(`\t\tRead: ${doc.data().Read}`);
-      });
-  });
-}
-
-*/
+                sendMessage(
+                    sender_ee_msg,
+                    creation_time,
+                    receiver_uid,
+                    SenderUID,convoID
+                );
+            });
+        }
+    })
+    .catch(function(error) {
+        console.error(func_name,"-> ERROR:", error);
+    });
+    response.send(convoID);
+});
