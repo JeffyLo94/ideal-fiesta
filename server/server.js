@@ -76,7 +76,7 @@ function setPublicKey(UID, publicKey) {
 
 /*/////////////////////////////////////////////////////////////////////////////
 Anytime a conversation is created, we add the new conversation id to the
-sender's and recevier's user documents.
+sender's and recevier's user document.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddConversationToUser(conversation_id,user_uid) {
     var func_name = "AddConversationToUser()";
@@ -84,15 +84,15 @@ function AddConversationToUser(conversation_id,user_uid) {
     console.log(func_name,"-> user_uid:",user_uid);
     var existing_list = [];
     db.collection('users').doc(user_uid).get()
-    .then(function(doc, existing_list) {
+    .then(function(doc,existing_list,conversation_id) {
         // Grab and save all of a user's existing conversations memberships ///
-        for(var x = 0; x < doc.data().conversation_id_list.length; x++) {
-            existing_list.push(doc.data().conversation_id_list[x]);
+        for(var x = 0; x < doc.data().conversations.length; x++) {
+            existing_list.push(doc.data().conversations[x]);
         }
         // Add this new conversation to the list //////////////////////////////
         existing_list.push(conversation_id);
         var convoRef = db.collection('users').doc(user_uid);
-        convoRef.update({conversation_id_list: existing_list});
+        convoRef.update({conversations: existing_list});
     })
     .catch(function(error) {
         console.error(func_name,
@@ -223,16 +223,16 @@ app.post('/newconvo', (request, response) => {
     console.log(func_name,"-> msg:", Msg);
     var creation_time = Date.now();
     var convoID;
-    // Make a new conversation object /////////////////////////////////////////
     db.collection("conversations").add({
+        // Make a new conversation object /////////////////////////////////////
         title: Title,
         receiver_uid_list: ReceiverUID,
         creator_uid: SenderUID,
         creation_time: creation_time,
         message_id_list:[],
     })
-    // Upon creation, perform encryption and post the first message ///////////
     .then(function(docRef) {
+        // Upon creation, perform encryption and post the first message ///////
         convoID = docRef.id;
         console.log(func_name,"-> SUCCESS: ID:", convoID);
 
