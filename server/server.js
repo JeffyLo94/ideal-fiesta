@@ -75,23 +75,24 @@ function setPublicKey(UID, publicKey) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Anytime a coversation is created add its id to the creator and participants
+Anytime a conversation is created, we add the new conversation id to the
+sender's and recevier's user documents.
 /////////////////////////////////////////////////////////////////////////////*/
-function AddConversationToUser(conversation_id,creator_uid,participant_uid) {
-    var fName = "AddConversationToUser()";
-    console.log(fName,"-> conversation_id:",conversation_id);
-    console.log(fName,"-> creator_uid:",creator_uid);
-    console.log(fName,"-> participant_uid:",participant_uid);
-    var existing_convo_id_list = [];
-    db.collection('users').doc(creator_uid).get()
-    .then(function(doc, existing_convo_id_list) {
-        existing_convo_id_list = doc.data().convo_id_list;
-        existing_convo_id_list.push(conversation_id);
-        var Ref = db.collection('users').doc(creator_uid);
-        Ref.update({convo_id_list: existing_convo_id_list});
+function AddConversationToUser(conversation_id,user_uid) {
+    var func_name = "AddConversationToUser()";
+
+    console.log(func_name," -> conversation_id:",conversation_id);
+    console.log(func_name," -> user_uid:",user_uid);
+    var existing_list = [];
+    db.collection('conversations').doc(conversation_id).get()
+    .then(function(doc, existing_list) {
+        existing_list = doc.data().message_id_list;
+        existing_list.push(conversation_id);
+        var convoRef = db.collection('conversations').doc(conversation_id);
+        convoRef.update({message_id_list: existing_list});
     })
     .catch(function(error) {
-        console.error("\tError adding conversation to creator: ", error);
+        console.error("\tError adding message to conversation: ", error);
     });;
 }
 
@@ -187,6 +188,20 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
+Mark a user offline
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/setoffline', (request, response) => {
+  console.log("/setoffline");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({status: "offline"});
+  response.send("OK");
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
 Control flow # 8.0.b. -> 8.4
 Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
@@ -221,27 +236,36 @@ app.post('/newconvo', (request, response) => {
       convoID = docRef.id;
       console.log("\tConversation posted with ID: ", convoID);
 
+      AddConversationToUser(convoID,SenderUID);
+
       // Perform first encryption layer
       Msg = creation_time + Msg;
       var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
 
       // Gather the public keys of every user in the conversation
       for(var i = 0; i < ReceiverUID.length; i++) {
-        //var receiver_uid = ReceiverUID[i];
-        console.log("\treceiver_uid: ",ReceiverUID[i]);
-        db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
-          //console.log("\tsender_public_key: ",doc.data().public_key);
+          //var receiver_uid = ReceiverUID[i];
+          console.log("\treceiver_uid: ",ReceiverUID[i]);
+          db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
+              //console.log("\tsender_public_key: ",doc.data().public_key);
 
-          var pin = doc.data().public_key;
-          var private = SenderEMsg;
-          var SenderEEMsg = aes256.encrypt(pin, private);
+              var receiver_uid = doc.id;
 
-          //console.log("\tsender_ee_msg:",SenderEEMsg);
+              AddConversationToUser(convoID,receiver_uid);
 
-          var receiver = doc.id;
+              var pin = doc.data().public_key;
+              var private = SenderEMsg;
+              var sender_ee_msg = aes256.encrypt(pin, private);
 
-          sendMessage(SenderEEMsg,creation_time,receiver,SenderUID,convoID);
-        });
+              //console.log("\tsender_ee_msg:",SenderEEMsg);
+
+              sendMessage(
+                  sender_ee_msg,
+                  creation_time,
+                  receiver_uid,
+                  SenderUID,convoID
+              );
+          });
       }
   })
   .catch(function(error) {
