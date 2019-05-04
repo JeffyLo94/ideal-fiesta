@@ -22,9 +22,12 @@ export class AccountFormComponent implements OnInit {
   acctForm: FormGroup;
   passwordMatcher = new PasswordErrSM();
   user: User;
+  isHidden: boolean = true;
 
   constructor(private formBuilder: FormBuilder) {
     this.acctForm = this.formBuilder.group({
+      email: [''],
+      username: [''],
       password: ['', [Validators.required]],
       confirmPassword: ['']
     }, { validator: this.checkPasswords });
@@ -40,4 +43,18 @@ export class AccountFormComponent implements OnInit {
     return pass === confirmPass ? null : { notSame: true };
   }
 
+  toggleHide() {
+    this.isHidden = !this.isHidden;
+    return this.isHidden;
+  }
+
+  submitAcct() {
+    console.log(`
+    Form:
+    email: ${this.acctForm.get('email').value}
+    username: ${this.acctForm.get('username').value}
+    password: ${this.acctForm.get('password').value}
+    confirmPassword: ${this.acctForm.get('confirmPassword').value}
+    `);
+  }
 }

@@ -22,6 +22,14 @@ export class AuthService {
     });
   }
 
+  async signUp(email: string, pass: string) {
+    try {
+      return await this.fireAuth.auth.createUserWithEmailAndPassword( email, pass );
+    } catch (e) {
+      alert('Error with Sign Up!' + e.message);
+    }
+  }
+
   async login(email: string, pass: string) {
     try {
       await this.fireAuth.auth.signInWithEmailAndPassword( email, pass );

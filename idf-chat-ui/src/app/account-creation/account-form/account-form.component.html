@@ -1,22 +1,26 @@
 <div class="card-container">
   <mat-card class="my-card">
-      <mat-card-title class="title" color="primary">Create</mat-card-title>
+      <mat-card-title class="title" color="primary">Sign Up</mat-card-title>
       <mat-card-content class="cardContent">
           <form class="my-form" (submit)="submitAcct()" [formGroup]="acctForm">
               <mat-form-field class="formField">
                   <mat-label>Email</mat-label>
-                  <input matInput placeholder="Email" name="email" [(ngModel)]="email" required>
+                  <input matInput placeholder="Email" name="email" formControlName='email' required>
+              </mat-form-field>
+              <mat-form-field class="formField">
+                  <mat-label>Username</mat-label>
+                  <input matInput placeholder="Username" name="username" formControlName='username' required>
               </mat-form-field>
               <mat-form-field class="formField">
                   <mat-label>Password</mat-label>
-                  <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" placeholder="Password" name="password" [(ngModel)]="pass" required>
-                  <mat-icon matSuffix (click)="hide = !hide">{{ hide ? 'visibility' : 'visibility_of'}}</mat-icon>
+                  <input matInput [type]="isHidden ? 'password' : 'text'" formControlName="password" placeholder="Password" name="password" required>
+                  <mat-icon matSuffix (click)="toggleHide()">{{ isHidden ? 'visibility' : 'visibility_off'}}</mat-icon>
                   <mat-error *ngIf="acctForm.hasError('required','password')">Please enter your new password</mat-error>
               </mat-form-field>
               <mat-form-field class="formField">
                   <mat-label>Confirm Password</mat-label>
-                  <input matInput [type]="hide ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter Password" name="password" [(ngModel)]="pass">
-                  <mat-icon matSuffix (click)="hide = !hide">{{ hide ? 'visibility' : 'visibility_of'}}</mat-icon>
+                  <input matInput [type]="isHidden ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Re-enter Password" name="confirmPassword">
+                  <mat-icon matSuffix (click)="toggleHide()">{{ isHidden ? 'visibility' : 'visibility_off'}}</mat-icon>
                   <mat-error *ngIf="acctForm.hasError('notSame')">Passwords don't match</mat-error>
               </mat-form-field>
           </form>
