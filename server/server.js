@@ -81,18 +81,21 @@ sender's and recevier's user documents.
 function AddConversationToUser(conversation_id,user_uid) {
     var func_name = "AddConversationToUser()";
 
-    console.log(func_name," -> conversation_id:",conversation_id);
-    console.log(func_name," -> user_uid:",user_uid);
+    console.log(func_name,"-> conversation_id:",conversation_id);
+    console.log(func_name,"-> user_uid:",user_uid);
     var existing_list = [];
-    db.collection('conversations').doc(conversation_id).get()
+    db.collection('users').doc(user_uid).get()
     .then(function(doc, existing_list) {
-        existing_list = doc.data().message_id_list;
+        existing_list = doc.data().conversation_id_list;
         existing_list.push(conversation_id);
         var convoRef = db.collection('conversations').doc(conversation_id);
-        convoRef.update({message_id_list: existing_list});
+        convoRef.update({conversation_id_list: existing_list});
     })
     .catch(function(error) {
-        console.error("\tError adding message to conversation: ", error);
+        console.error(func_name,
+            "-> ERROR:",
+            error
+        );
     });;
 }
 
@@ -103,9 +106,10 @@ Anytime a message is created, we add the new message id to the conversation
 document that it belongs belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
-    console.log("AddMessageToConversation()");
-    console.log("\tmessage_id:",message_id);
-    console.log("\tconversation_id:",conversation_id);
+    var func_name = "AddMessageToConversation()";
+
+    console.log(func_name,"-> message_id:      ",message_id);
+    console.log(func_name,"-> conversation_id: ",conversation_id);
     var existing_message_id_list = [];
     db.collection('conversations').doc(conversation_id).get()
     .then(function(doc, existing_message_id_list) {
@@ -115,7 +119,7 @@ function AddMessageToConversation(message_id, conversation_id) {
         convoRef.update({message_id_list: existing_message_id_list});
     })
     .catch(function(error) {
-        console.error("\tError adding message to conversation: ", error);
+        console.error(func_name,"-> Error adding message to conversation: ", error);
     });;
 }
 
@@ -125,12 +129,13 @@ function AddMessageToConversation(message_id, conversation_id) {
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
-  console.log("sendMessage()");
+  var func_name = "sendMessage()";
+
   //console.log("\tSenderEEMsg:", SenderEEMsg);
-  console.log("\tcreation_time: ", creation_time);
-  console.log("\tconversation_id: ", conversation_id);
-  console.log("\treceiver_uid:  ", ReceiverUID);
-  console.log("\tsender_uid:    ", SenderUID);
+  console.log(func_name,"-> creation_time:   ", creation_time);
+  console.log(func_name,"-> conversation_id: ", conversation_id);
+  console.log(func_name,"-> receiver_uid:    ", ReceiverUID);
+  console.log(func_name,"-> sender_uid:      ", SenderUID);
   // Create a place to store the message id after it has been created
   var message_id;
   // Post the message
@@ -143,12 +148,12 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
   })
   .then(function(docRef) {
       message_id = docRef.id;
-      console.log("\tMessage posted. ID: ", message_id);
+      console.log(func_name,"-> SUCCESS: ID:", message_id);
       // Add the new message's id into the conversation it belongs to
       AddMessageToConversation(message_id,conversation_id);
   })
   .catch(function(error) {
-      console.error("\tError posting message: ", error);
+      console.error(func_name,"-> ERROR:", error);
   });
   return message_id;
 }
@@ -206,7 +211,7 @@ Control flow # 8.0.b. -> 8.4
 Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
-  console.log("/newconvo");
+  var func_name = "/newconvo";
 
   // Unpackage and document the request
   var SenderUID = request.body.SenderUID;
@@ -214,11 +219,9 @@ app.post('/newconvo', (request, response) => {
   var SenderPrivate = request.body.SenderPrivate;
   var Title = request.body.Title;
   var Msg = request.body.Msg;
-  console.log("\tsender_uid:   ", SenderUID);
-  //console.log("\tReceiverUID:   ", ReceiverUID);
-  //console.log("\tSenderPrivate: ", SenderPrivate);
-  console.log("\ttitle:        ", Title);
-  console.log("\tmsg:          ", Msg);
+  console.log(func_name,"-> sender_uid:", SenderUID);
+  console.log(func_name,"-> title:     ", Title);
+  console.log(func_name,"-> msg:       ", Msg);
 
   var creation_time = Date.now();
 
@@ -234,7 +237,7 @@ app.post('/newconvo', (request, response) => {
   // Upon creation, perform encryption and post the first message.
   .then(function(docRef) {
       convoID = docRef.id;
-      console.log("\tConversation posted with ID: ", convoID);
+      console.log(func_name,"-> SUCCESS: ID:", convoID);
 
       AddConversationToUser(convoID,SenderUID);
 
@@ -257,8 +260,6 @@ app.post('/newconvo', (request, response) => {
               var private = SenderEMsg;
               var sender_ee_msg = aes256.encrypt(pin, private);
 
-              //console.log("\tsender_ee_msg:",SenderEEMsg);
-
               sendMessage(
                   sender_ee_msg,
                   creation_time,
@@ -269,7 +270,7 @@ app.post('/newconvo', (request, response) => {
       }
   })
   .catch(function(error) {
-      console.error("Error posting message: ", error);
+      console.error(func_name,"-> ERROR:", error);
   });
   response.send(convoID);
 });
