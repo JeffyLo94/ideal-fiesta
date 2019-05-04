@@ -1,0 +1,5 @@
+
+.vscode/settings.json
+package-lock.json
+
+idf-chat-ui/node_modules
