@@ -207,64 +207,63 @@ Control flow # 8.0.b. -> 8.4
 Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
-  var func_name = "/newconvo";
+    var func_name = "/newconvo";
+    // Unpackage and document the request /////////////////////////////////////
+    var SenderUID = request.body.SenderUID;
+    var ReceiverUID = request.body.ReceiverUID;
+    var SenderPrivate = request.body.SenderPrivate;
+    var Title = request.body.Title;
+    var Msg = request.body.Msg;
+    console.log(func_name,"-> sender_uid:", SenderUID);
+    console.log(func_name,"-> title:", Title);
+    console.log(func_name,"-> msg:", Msg);
+    var creation_time = Date.now();
+    var convoID;
+    // Make a new conversation object /////////////////////////////////////////
+    db.collection("conversations").add({
+        title: Title,
+        receiver_uid_list: ReceiverUID,
+        creator_uid: SenderUID,
+        creation_time: creation_time,
+        message_id_list:[],
+    })
+    // Upon creation, perform encryption and post the first message ///////////
+    .then(function(docRef) {
+        convoID = docRef.id;
+        console.log(func_name,"-> SUCCESS: ID:", convoID);
 
-  // Unpackage and document the request
-  var SenderUID = request.body.SenderUID;
-  var ReceiverUID = request.body.ReceiverUID;
-  var SenderPrivate = request.body.SenderPrivate;
-  var Title = request.body.Title;
-  var Msg = request.body.Msg;
-  console.log(func_name,"-> sender_uid:", SenderUID);
-  console.log(func_name,"-> title:", Title);
-  console.log(func_name,"-> msg:", Msg);
-  var creation_time = Date.now();
-  var convoID;
-  // Make a new conversation object
-  db.collection("conversations").add({
-      title: Title,
-      receiver_uid_list: ReceiverUID,
-      creator_uid: SenderUID,
-      creation_time: creation_time,
-      message_id_list:[],
-  })
-  // Upon creation, perform encryption and post the first message.
-  .then(function(docRef) {
-      convoID = docRef.id;
-      console.log(func_name,"-> SUCCESS: ID:", convoID);
+        AddConversationToUser(convoID,SenderUID);
 
-      AddConversationToUser(convoID,SenderUID);
+        // Perform first encryption layer
+        Msg = creation_time + Msg;
+        var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
 
-      // Perform first encryption layer
-      Msg = creation_time + Msg;
-      var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
+        // Gather the public keys of every user in the conversation
+        for(var i = 0; i < ReceiverUID.length; i++) {
+            //var receiver_uid = ReceiverUID[i];
+            console.log("\treceiver_uid: ",ReceiverUID[i]);
+            db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
+                //console.log("\tsender_public_key: ",doc.data().public_key);
 
-      // Gather the public keys of every user in the conversation
-      for(var i = 0; i < ReceiverUID.length; i++) {
-          //var receiver_uid = ReceiverUID[i];
-          console.log("\treceiver_uid: ",ReceiverUID[i]);
-          db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
-              //console.log("\tsender_public_key: ",doc.data().public_key);
+                var receiver_uid = doc.id;
 
-              var receiver_uid = doc.id;
+                AddConversationToUser(convoID,receiver_uid);
 
-              AddConversationToUser(convoID,receiver_uid);
+                var pin = doc.data().public_key;
+                var private = SenderEMsg;
+                var sender_ee_msg = aes256.encrypt(pin, private);
 
-              var pin = doc.data().public_key;
-              var private = SenderEMsg;
-              var sender_ee_msg = aes256.encrypt(pin, private);
-
-              sendMessage(
-                  sender_ee_msg,
-                  creation_time,
-                  receiver_uid,
-                  SenderUID,convoID
-              );
-          });
-      }
-  })
-  .catch(function(error) {
-      console.error(func_name,"-> ERROR:", error);
-  });
-  response.send(convoID);
+                sendMessage(
+                    sender_ee_msg,
+                    creation_time,
+                    receiver_uid,
+                    SenderUID,convoID
+                );
+            });
+        }
+    })
+    .catch(function(error) {
+        console.error(func_name,"-> ERROR:", error);
+    });
+    response.send(convoID);
 });
