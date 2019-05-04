@@ -85,9 +85,13 @@ function AddConversationToUser(conversation_id,user_uid) {
     var existing_list = [];
     db.collection('users').doc(user_uid).get()
     .then(function(doc, existing_list) {
-        existing_list = doc.data().conversation_id_list;
+        // Grab and save all of a user's existing conversations memberships ///
+        for(var x = 0; x < doc.data().conversation_id_list.length; x++) {
+            existing_list.push(doc.data().conversation_id_list[x]);
+        }
+        // Add this new conversation to the list //////////////////////////////
         existing_list.push(conversation_id);
-        var convoRef = db.collection('conversations').doc(conversation_id);
+        var convoRef = db.collection('users').doc(user_uid);
         convoRef.update({conversation_id_list: existing_list});
     })
     .catch(function(error) {
@@ -105,9 +109,9 @@ Anytime a message is created, we add the new message id to the conversation
 document that it belongs belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 function AddMessageToConversation(message_id, conversation_id) {
-    var func_name = "AddMessageToConversation()";
-    console.log(func_name,"-> message_id:      ",message_id);
-    console.log(func_name,"-> conversation_id: ",conversation_id);
+    var func_name = "AddMessageToConversation() ->";
+    console.log(func_name,"message_id:",message_id);
+    console.log(func_name,"conversation_id:",conversation_id);
     var existing_message_id_list = [];
     db.collection('conversations').doc(conversation_id).get()
     .then(function(doc, existing_message_id_list) {
@@ -117,7 +121,7 @@ function AddMessageToConversation(message_id, conversation_id) {
         convoRef.update({message_id_list: existing_message_id_list});
     })
     .catch(function(error) {
-        console.error(func_name,"-> Error adding message to conversation: ", error);
+        console.error(func_name,"ERROR:",error);
     });;
 }
 
@@ -182,7 +186,7 @@ app.post('/setonline', (request, response) => {
   var uid = request.body.UID;
   console.log("\tUID: ", uid);
   var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({status: "online"});
+  var updateSingle = userRef.update({online:true});
   response.send("OK");
 });
 
@@ -196,7 +200,7 @@ app.post('/setoffline', (request, response) => {
   var uid = request.body.UID;
   console.log("\tUID: ", uid);
   var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({status: "offline"});
+  var updateSingle = userRef.update({online:false});
   response.send("OK");
 });
 
@@ -266,4 +270,33 @@ app.post('/newconvo', (request, response) => {
         console.error(func_name,"-> ERROR:", error);
     });
     response.send(convoID);
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Create a new user document
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/newuser', (request, response) => {
+    var func_name = "/newuser";
+    console.log(func_name);
+    var creation_time = Date.now();
+    var user_uid;
+    db.collection("users").add({
+        // Make a new user object /////////////////////////////////////////////
+        conversations:[],
+        creation_time:creation_time,
+        email:"",
+        online:false,
+        public_key:"",
+        username:""
+    })
+    .then(function(docRef) {
+        user_uid = docRef.id;
+        console.log(func_name,"-> SUCCESS: ID:", user_uid);
+    })
+    .catch(function(error) {
+        console.error(func_name,"-> ERROR:", error);
+    });
+    response.send(user_uid);
 });
