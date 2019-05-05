@@ -84,13 +84,16 @@ Retrieve a message and perform decryption twice.
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/getmsg', (request, response) => {
     var func_name = "/getmsg ->";
+    // Collect data from the request //////////////////////////////////////////
     var message_id = request.body.message_id;
-    var timestamp;
+    var receiver_public_key = request.body.receiver_public_key;
     db.collection('messages').doc(message_id).get()
     .then(function(doc) {
-        timestamp = doc.data().creation_time;
-        timestamp = timestamp.toString();
-        response.send(timestamp);
+        var sender_ee_msg = doc.data().sender_ee_msg;
+        console.log(func_name,"got to here");
+        var sender_e_msg = aes256.decrypt(receiver_public_key, sender_ee_msg);
+        console.log(func_name,"sender_e_msg",sender_e_msg);
+        response.send(sender_e_msg);
     })
     .catch(function(error) {
         console.error(func_name,"ERROR:",error);
@@ -187,11 +190,11 @@ app.post('/newuser', (request, response) => {
     })
     .then(function(docRef) {
         user_uid = docRef.id;
-        console.log(func_name,"-> SUCCESS: ID:", user_uid);
+        console.log(func_name,"-> SUCCESS: ID:",user_uid);
         response.send(user_uid);
     })
     .catch(function(error) {
-        console.error(func_name,"-> ERROR:", error);
+        console.error(func_name,"-> ERROR:",error);
     });
 });
 
