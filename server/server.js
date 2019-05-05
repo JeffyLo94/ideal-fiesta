@@ -44,18 +44,21 @@ var db = firebase.firestore();
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Control flow # 2.0
-Generate a public/private key pair
+Generate a public key
 /////////////////////////////////////////////////////////////////////////////*/
-app.post('/genpair', (request, response) => {
-    var func_name = "/genpair ->";
-    var uid = request.body.UID;
-    console.log("\tUID: ", uid);
-    var pair = keypair();
-    console.log(func_name,"Public:", pair.public);
-    console.log(func_name,"Private:", pair.private);
-    setPublicKey(request.body.UID, pair.public)
-    response.send(pair);
+app.post('/genpublic', (request, response) => {
+    var func_name = "/genpublic ->";
+    var user_id = request.body.user_id;
+    var pin = request.body.pin;
+    var public_key = aes256.encrypt(pin,user_id);
+    console.log(
+        func_name,"\n",
+        "\t","user_id:",user_id,"\n",
+        "\t","pin:",pin,"\n",
+        "\t","public_key:",public_key,"\n"
+    );
+    setPublicKey(user_id,public_key)
+    response.send(public_key);
 });
 
 
@@ -216,6 +219,43 @@ app.post('/setoffline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
+Send a message
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/sendmsg',(request, response) => {
+    var func_name = "/sendmsg ->";
+    // Capture information from the request ///////////////////////////////////
+    var conversation_id = request.body.conversation;
+    var msg = request.body.msg;
+    var receiver_id = request.body.receiver_id;
+    var sender_id = request.body.sender_id;
+    var timestamp = Date.now();
+    // Get dependencies ///////////////////////////////////////////////////////
+    var sender_public = getpublic(sender_id);
+    var receiver_public = getpublic(receiver_id);
+    // Encrypt the message ////////////////////////////////////////////////////
+    var msg_encrypted = aes256.encrypt(sender_public+receiver_public,msg);
+    // Perform the transaction ////////////////////////////////////////////////
+    db.collection('messages').add({
+        conversation_id:conversation_id,
+        msg_encrypted:msg_encrypted,
+        receiver_id:receiver_id,
+        sender_id:sender_id,
+        timestamp:timestamp
+    })
+    .then(function(docRef) {
+        message_id = docRef.id;
+        console.log(func_name,"SUCCESS: ID:", message_id);
+        // Add the new message's id into the conversation it belongs to ///////
+        AddMessageToConversation(message_id,conversation_id);
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:", error);
+    });
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
 Control flow # 7.0
 Mark a user online
 /////////////////////////////////////////////////////////////////////////////*/
@@ -243,6 +283,25 @@ app.post('/submitpin', (request, response) => {
     console.log("\tPRIVATE: ", private);
     console.log("\tEncrypted Private: ", encrypted);
     response.send(encrypted);
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Test encryption and decryption
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/testaes', (request, response) => {
+    console.log("/testaes");
+    //var pin     = request.body.PIN;
+    //var private = request.body.PRIVATE;
+    var encrypted = aes256.encrypt("GYnACAngG+qQm2r1DKsbXeg6UgK+H+L9/g==OFytRX4wPit3aBvGLF6CHzsPBueeu4Bd/w==","mymessage");
+    console.log("encrypted",encrypted);
+    var decrypted = aes256.decrypt("GYnACAngG+qQm2r1DKsbXeg6UgK+H+L9/g==OFytRX4wPit3aBvGLF6CHzsPBueeu4Bd/w==",encrypted);
+    console.log("decrypted",decrypted);
+    //console.log("\tPIN: ", pin);
+    //console.log("\tPRIVATE: ", private);
+    //console.log("\tEncrypted Private: ", encrypted);
+    response.send(decrypted);
 });
 
 
@@ -333,13 +392,10 @@ function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, convers
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Control flow # 3.0
 Add public key to a document in the "users" collection
 /////////////////////////////////////////////////////////////////////////////*/
-function setPublicKey(UID, publicKey) {
-  console.log("setPublicKey()");
-  console.log("\tUID:", UID);
-  console.log("\tpublicKey:", publicKey);
-  var userRef = db.collection('users').doc(UID);
-  var updateSingle = userRef.update({public_key: publicKey});
+function setPublicKey(user_id,public_key) {
+    var func_name = "setPublicKey() ->";
+    var user_doc = db.collection('users').doc(user_id);
+    var updateSingle = user_doc.update({public_key: public_key});
 }
