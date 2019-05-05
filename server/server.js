@@ -90,7 +90,8 @@ app.post('/getmsg', (request, response) => {
     db.collection('messages').doc(message_id).get()
     .then(function(doc) {
         var sender_ee_msg = doc.data().sender_ee_msg;
-        console.log(func_name,"got to here");
+        console.log(func_name,"sender_ee_msg",sender_ee_msg);
+        console.log(func_name,"receiver_public_key",receiver_public_key);
         var sender_e_msg = aes256.decrypt(receiver_public_key, sender_ee_msg);
         console.log(func_name,"sender_e_msg",sender_e_msg);
         response.send(sender_e_msg);
