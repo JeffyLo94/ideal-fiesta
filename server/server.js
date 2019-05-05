@@ -61,146 +61,14 @@ app.post('/genpair', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Control flow # 3.0
-Add public key to a document in the "users" collection
+Retrieve the list of conversations a user belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
-function setPublicKey(UID, publicKey) {
-  console.log("setPublicKey()");
-  console.log("\tUID:", UID);
-  console.log("\tpublicKey:", publicKey);
-  var userRef = db.collection('users').doc(UID);
-  var updateSingle = userRef.update({public_key: publicKey});
-}
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Anytime a conversation is created, we add the new conversation id to the
-sender's and recevier's user document.
-/////////////////////////////////////////////////////////////////////////////*/
-function AddConversationToUser(conversation_id,user_uid) {
-    var func_name = "AddConversationToUser() ->";
-    console.log(func_name,"conversation_id:",conversation_id);
-    console.log(func_name,"user_uid:",user_uid);
-    var existing_conversation_id_list = [];
-    db.collection('users').doc(user_uid).get()
-    .then(function(doc, existing_conversation_id_list) {
-        console.log(func_name,"user",user_uid,"has",
-            doc.data().conversations.length,"existing conversations"
-        );
-        existing_conversation_id_list = doc.data().conversations;
-        existing_conversation_id_list.push(conversation_id);
-        var userRef = db.collection('users').doc(user_uid);
-        userRef.update({conversations: existing_conversation_id_list});
-    })
-    .catch(function(error) {
-        console.error(func_name,"ERROR:",error);
-    });;
-}
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Anytime a message is created, we add the new message id to the conversation
-document that it belongs belongs to.
-/////////////////////////////////////////////////////////////////////////////*/
-function AddMessageToConversation(message_id, conversation_id) {
-    var func_name = "AddMessageToConversation() ->";
-    console.log(func_name,"message_id:",message_id);
-    console.log(func_name,"conversation_id:",conversation_id);
-    var existing_message_id_list = [];
-    db.collection('conversations').doc(conversation_id).get()
-    .then(function(doc, existing_message_id_list) {
-        console.log(func_name,"conversation",conversation_id,"has",
-            doc.data().message_id_list.length,"existing messages"
-        );
-        existing_message_id_list = doc.data().message_id_list;
-        existing_message_id_list.push(message_id);
-        var convoRef = db.collection('conversations').doc(conversation_id);
-        convoRef.update({message_id_list: existing_message_id_list});
-    })
-    .catch(function(error) {
-        console.error(func_name,"ERROR:",error);
-    });;
-}
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Send a message
-/////////////////////////////////////////////////////////////////////////////*/
-function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
-  var func_name = "sendMessage() ->";
-  console.log(func_name,"creation_time:",creation_time);
-  console.log(func_name,"conversation_id:", conversation_id);
-  console.log(func_name,"receiver_uid:", ReceiverUID);
-  console.log(func_name,"sender_uid:", SenderUID);
-  // Create a place to store the message id after it has been created
-  var message_id;
-  // Post the message
-  db.collection("messages").add({
-      sender_ee_msg: SenderEEMsg,
-      creation_time: creation_time,
-      receiver_uid: ReceiverUID,
-      sender_uid: SenderUID,
-      receiver_read: false
-  })
-  .then(function(docRef) {
-      message_id = docRef.id;
-      console.log(func_name,"SUCCESS: ID:", message_id);
-      // Add the new message's id into the conversation it belongs to
-      AddMessageToConversation(message_id,conversation_id);
-  })
-  .catch(function(error) {
-      console.error(func_name,"ERROR:", error);
-  });
-  return message_id;
-}
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Control flow # 4.0 & 5.0
-Encrypt and return a user's private key
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/submitpin', (request, response) => {
-  console.log("/submitpin");
-  var pin     = request.body.PIN;
-  var private = request.body.PRIVATE;
-  var encrypted = aes256.encrypt(pin,private);
-  console.log("\tPIN: ", pin);
-  console.log("\tPRIVATE: ", private);
-  console.log("\tEncrypted Private: ", encrypted);
-  response.send(encrypted);
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Control flow # 7.0
-Mark a user online
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/setonline', (request, response) => {
-  console.log("/setonline");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({online:true});
-  response.send("OK");
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Mark a user offline
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/setoffline', (request, response) => {
-  console.log("/setoffline");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({online:false});
-  response.send("OK");
+app.post('/getconvos', (request, response) => {
+    var func_name = "/getconvos ->"
+    var user_id = request.body.UID;
+    var conversations = [];
+    console.log(func_name,"UID:",user_id);
+    response.send(conversations);
 });
 
 
@@ -299,3 +167,148 @@ app.post('/newuser', (request, response) => {
         console.error(func_name,"-> ERROR:", error);
     });
 });
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Mark a user offline
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/setoffline', (request, response) => {
+  console.log("/setoffline");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({online:false});
+  response.send("OK");
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 7.0
+Mark a user online
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/setonline', (request, response) => {
+  console.log("/setonline");
+  var uid = request.body.UID;
+  console.log("\tUID: ", uid);
+  var userRef = db.collection('users').doc(uid);
+  var updateSingle = userRef.update({online:true});
+  response.send("OK");
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 4.0 & 5.0
+Encrypt and return a user's private key
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/submitpin', (request, response) => {
+  console.log("/submitpin");
+  var pin     = request.body.PIN;
+  var private = request.body.PRIVATE;
+  var encrypted = aes256.encrypt(pin,private);
+  console.log("\tPIN: ", pin);
+  console.log("\tPRIVATE: ", private);
+  console.log("\tEncrypted Private: ", encrypted);
+  response.send(encrypted);
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Anytime a conversation is created, we add the new conversation id to the
+sender's and recevier's user document.
+/////////////////////////////////////////////////////////////////////////////*/
+function AddConversationToUser(conversation_id,user_uid) {
+    var func_name = "AddConversationToUser() ->";
+    console.log(func_name,"conversation_id:",conversation_id);
+    console.log(func_name,"user_uid:",user_uid);
+    var existing_conversation_id_list = [];
+    db.collection('users').doc(user_uid).get()
+    .then(function(doc, existing_conversation_id_list) {
+        console.log(func_name,"user",user_uid,"has",
+            doc.data().conversations.length,"existing conversations"
+        );
+        existing_conversation_id_list = doc.data().conversations;
+        existing_conversation_id_list.push(conversation_id);
+        var userRef = db.collection('users').doc(user_uid);
+        userRef.update({conversations: existing_conversation_id_list});
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:",error);
+    });;
+}
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Anytime a message is created, we add the new message id to the conversation
+document that it belongs belongs to.
+/////////////////////////////////////////////////////////////////////////////*/
+function AddMessageToConversation(message_id, conversation_id) {
+    var func_name = "AddMessageToConversation() ->";
+    console.log(func_name,"message_id:",message_id);
+    console.log(func_name,"conversation_id:",conversation_id);
+    var existing_message_id_list = [];
+    db.collection('conversations').doc(conversation_id).get()
+    .then(function(doc, existing_message_id_list) {
+        console.log(func_name,"conversation",conversation_id,"has",
+            doc.data().message_id_list.length,"existing messages"
+        );
+        existing_message_id_list = doc.data().message_id_list;
+        existing_message_id_list.push(message_id);
+        var convoRef = db.collection('conversations').doc(conversation_id);
+        convoRef.update({message_id_list: existing_message_id_list});
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:",error);
+    });;
+}
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Send a message
+/////////////////////////////////////////////////////////////////////////////*/
+function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
+  var func_name = "sendMessage() ->";
+  console.log(func_name,"creation_time:",creation_time);
+  console.log(func_name,"conversation_id:", conversation_id);
+  console.log(func_name,"receiver_uid:", ReceiverUID);
+  console.log(func_name,"sender_uid:", SenderUID);
+  // Create a place to store the message id after it has been created
+  var message_id;
+  // Post the message
+  db.collection("messages").add({
+      sender_ee_msg: SenderEEMsg,
+      creation_time: creation_time,
+      receiver_uid: ReceiverUID,
+      sender_uid: SenderUID,
+      receiver_read: false
+  })
+  .then(function(docRef) {
+      message_id = docRef.id;
+      console.log(func_name,"SUCCESS: ID:", message_id);
+      // Add the new message's id into the conversation it belongs to
+      AddMessageToConversation(message_id,conversation_id);
+  })
+  .catch(function(error) {
+      console.error(func_name,"ERROR:", error);
+  });
+  return message_id;
+}
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Control flow # 3.0
+Add public key to a document in the "users" collection
+/////////////////////////////////////////////////////////////////////////////*/
+function setPublicKey(UID, publicKey) {
+  console.log("setPublicKey()");
+  console.log("\tUID:", UID);
+  console.log("\tpublicKey:", publicKey);
+  var userRef = db.collection('users').doc(UID);
+  var updateSingle = userRef.update({public_key: publicKey});
+}
