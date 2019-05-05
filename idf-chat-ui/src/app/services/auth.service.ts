@@ -11,7 +11,7 @@ export class AuthService {
   private user: User;
 
 
-  constructor(public  fireAuth: AngularFireAuth, public  router: Router) { 
+  constructor(public  fireAuth: AngularFireAuth, public  router: Router) {
     this.fireAuth.authState.subscribe(user => {
       if (user) {
         this.user = user;
@@ -48,5 +48,10 @@ export class AuthService {
   get isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user'));
     return user !== null;
+  }
+
+  get currentUser(): User {
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user;
   }
 }

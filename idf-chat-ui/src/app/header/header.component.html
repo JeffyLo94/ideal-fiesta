@@ -1,23 +1,65 @@
-<mat-toolbar color="primary" class="navbar">
-    <mat-toolbar-row>
-        <div class="logo">
-            <a class="plain-link" target="_blank" href="">
-                <div class="link" *ngIf="displayLogo">
-                    IDF-SecureChat
-                    <!-- Substitute for Logo Here-->
-                </div>
-            </a>
+<mat-toolbar class="app-header">
+    <div class="header-leftSide">
+        <!-- Mini Menu-->
+        <button id="navMenuButton" mat-icon-button [matMenuTriggerFor]="menu" class="header-menu-card navMenuButton">
+            <span class="material-icons">menu</span>
+        </button>
+        <mat-menu #menu="matMenu" class="header-mat-menu">
+        <button mat-menu-item *ngFor="let link of links" [routerLink]="link.path">
+            <mat-icon class="material-icons">{{ link.icon }}</mat-icon>
+            <span class="menu-button-text">{{ link.text }}</span>
+        </button>
+        </mat-menu>
+
+        <!-- -->
+        <div class="ls header-logo" *ngIf="displayLogo">
+        <a target="_self" href="/" class="header-logo-link">
+            <img class="header-logo-link-img">
+        </a>
         </div>
-        <div class="view">
-            {{ view }}
+        <div class="ls header-label">
+        <span class="header-label-text">{{ label | uppercase }}</span>
         </div>
-        <div class="page-links">
-            <span class="link" *ngFor="let link of links" [routerLink]="link.path">
-              {{ link.text }}
+        <div class="ls header-navBar">
+        <span class="header-link" *ngFor="let link of links" [routerLink]="link.path" routerLinkActive="header-link-active">
+            <mat-icon class="header-link-icon material-icons">{{ link.icon }}</mat-icon>
+            <span class="header-link-text">{{ link.text }}</span>
+        </span>
+        </div>
+    </div>
+    <div class="header-rightSide">
+        <div class="rs header-account" *ngIf="hasLogin">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="header-menu-card">
+            <!-- This needs some authentication component -->
+            <span style="width:24px" *ngIf="user.avatarUrl;else useIcon">
+            <img src={{user.avatarUrl}} alt="">
             </span>
-            <span *ngIf="authService.isLoggedIn" class="nav-item">
-             <a class="nav-link"  (click)="authService.logout()">Logout</a>
+            <ng-template #useIcon>
+            <span style="width:24px" class="material-icons">account_circle_outline</span>
+            </ng-template>
+        </button>
+        <mat-menu #userMenu="matMenu" class="header-mat-menu">
+            <span mat-menu-item *ngIf="user">
+            <img *ngIf="user.avatarUrl;else useIcon" src={{user.avatarUrl}} alt="">
+            <ng-template #useIcon>
+                <mat-icon class="material-icons">account_circle_outline</mat-icon>
+                </ng-template>
+            <span class="menu-button-text">{{ user.name }}</span>
             </span>
+            <button mat-menu-item *ngIf="user" (click)="handleLogout()">
+            <mat-icon class="material-icons">power_settings_new</mat-icon>
+            <span class="menu-button-text">Logout</span>
+            </button>
+            <button mat-menu-item *ngIf="!user" (click)="handleLogin()">
+                <span class="menu-button-text">Log In</span>
+            </button>
+        </mat-menu>
         </div>
-    </mat-toolbar-row>
+        <div class="rs header-help"><a>Help</a></div>
+        <div class="rs header-fullscreen">
+        <button class="header-button" (click)="toggleFullscreen()">
+            <span class="material-icons">{{fullscreenIcon}}</span>
+        </button>
+        </div>
+    </div>
 </mat-toolbar>
