@@ -236,22 +236,6 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Encrypt and return a user's private key
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/submitpin', (request, response) => {
-    console.log("/submitpin");
-    var pin     = request.body.PIN;
-    var private = request.body.PRIVATE;
-    var encrypted = aes256.encrypt(pin,private);
-    console.log("\tPIN: ", pin);
-    console.log("\tPRIVATE: ", private);
-    console.log("\tEncrypted Private: ", encrypted);
-    response.send(encrypted);
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
 Test encryption and decryption
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/testaes', (request, response) => {
