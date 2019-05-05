@@ -83,25 +83,21 @@ app.post('/getconvos', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Retrieve a message and perform decryption twice.
+Retrieve a specific message.
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/getmsg', (request, response) => {
     var func_name = "/getmsg ->";
     // Collect data from the request //////////////////////////////////////////
     var message_id = request.body.message_id;
-    var receiver_public_key = request.body.receiver_public_key;
-    db.collection('messages').doc(message_id).get()
-    .then(function(doc) {
-        var sender_ee_msg = doc.data().sender_ee_msg;
-        console.log(func_name,"sender_ee_msg",sender_ee_msg);
-        console.log(func_name,"receiver_public_key",receiver_public_key);
-        var sender_e_msg = aes256.decrypt(receiver_public_key, sender_ee_msg);
-        console.log(func_name,"sender_e_msg",sender_e_msg);
-        response.send(sender_e_msg);
-    })
-    .catch(function(error) {
-        console.error(func_name,"ERROR:",error);
-    });;
+    var receiver_id = request.body.receiver_id;
+    var sender_id = request.body.sender_id;
+    console.log(
+        func_name,"\n",
+        "\t","message_id:",message_id,"\n",
+        "\t","receiver_id:",receiver_id,"\n",
+        "\t","sender_id:",sender_id,"\n"
+    );
+    response.send(getMessage(message_id,receiver_id,sender_id));
 });
 
 
@@ -327,6 +323,59 @@ function AddMessageToConversation(message_id, conversation_id) {
 }
 
 
+
+/*/////////////////////////////////////////////////////////////////////////////
+Given a message id, receiver and sender, retrieve the correct public keys,
+decrypt and return the plaintext message.
+/////////////////////////////////////////////////////////////////////////////*/
+function getMessage(
+    message_id,receiver_id,sender_id) {
+    var func_name = "getMessage() ->";
+    // First get sender's public key //////////////////////////////////////////
+    db.collection('users').doc(sender_id).get()
+    .then(function(doc) {
+        var sender_public = doc.data().public_key;
+        console.log(
+            func_name,"\n",
+            "\t","sender_public:",sender_public,"\n"
+        );
+        // Next get receiver's public key /////////////////////////////////////
+        db.collection('users').doc(receiver_id).get()
+        .then(function(doc) {
+            var receiver_public = doc.data().public_key;
+            console.log(
+                func_name,"\n",
+                "\t\t","receiver_public:",receiver_public,"\n"
+            );
+            db.collection('messages').doc(message_id).get()
+            .then(function(doc) {
+                // Decrypt the message ////////////////////////////////////////////
+                var msg_encrypted = doc.data().msg_encrypted;
+                var msg_decrypted = aes256.decrypt(
+                    sender_public+receiver_public,msg_encrypted
+                );
+                console.log(
+                    func_name,"\n",
+                    "\t\t\t","msg_encrypted:",msg_encrypted,"\n",
+                    "\t\t\t","msg_decrypted:",msg_decrypted,"\n"
+                );
+                return msg_decrypted;
+            })
+            .catch(function(error) {
+                console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
+            });;
+        })
+        .catch(function(error) {
+            console.error(func_name,"ERROR GETTING RECEIVER DOC:",error);
+        });;
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR GETTING SENDER DOC:",error);
+    });;
+}
+
+
+
 /*/////////////////////////////////////////////////////////////////////////////
 Find and return a specified user's public key
 /////////////////////////////////////////////////////////////////////////////*/
@@ -350,7 +399,9 @@ function getPublic(user_id) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Send a message
+Given a conversation, plaintext message, receiver, sender and timestamp,
+retrieve the correct public keys, encrypt the message and create the new
+message document.
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(
     conversation_id,msg,receiver_id,sender_id,timestamp) {
