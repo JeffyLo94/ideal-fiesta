@@ -91,13 +91,14 @@ app.post('/getmsg', (request, response) => {
     var message_id = request.body.message_id;
     var receiver_id = request.body.receiver_id;
     var sender_id = request.body.sender_id;
+    var result = getMessage(message_id,receiver_id,sender_id,response);
     console.log(
         func_name,"\n",
         "\t","message_id:",message_id,"\n",
         "\t","receiver_id:",receiver_id,"\n",
-        "\t","sender_id:",sender_id,"\n"
+        "\t","sender_id:",sender_id,"\n",
+        "\t","result:",result,"\n",
     );
-    response.send(getMessage(message_id,receiver_id,sender_id));
 });
 
 
@@ -329,24 +330,16 @@ Given a message id, receiver and sender, retrieve the correct public keys,
 decrypt and return the plaintext message.
 /////////////////////////////////////////////////////////////////////////////*/
 function getMessage(
-    message_id,receiver_id,sender_id) {
+    message_id,receiver_id,sender_id,response) {
     var func_name = "getMessage() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
         var sender_public = doc.data().public_key;
-        console.log(
-            func_name,"\n",
-            "\t","sender_public:",sender_public,"\n"
-        );
         // Next get receiver's public key /////////////////////////////////////
         db.collection('users').doc(receiver_id).get()
         .then(function(doc) {
             var receiver_public = doc.data().public_key;
-            console.log(
-                func_name,"\n",
-                "\t\t","receiver_public:",receiver_public,"\n"
-            );
             db.collection('messages').doc(message_id).get()
             .then(function(doc) {
                 // Decrypt the message ////////////////////////////////////////////
@@ -354,12 +347,7 @@ function getMessage(
                 var msg_decrypted = aes256.decrypt(
                     sender_public+receiver_public,msg_encrypted
                 );
-                console.log(
-                    func_name,"\n",
-                    "\t\t\t","msg_encrypted:",msg_encrypted,"\n",
-                    "\t\t\t","msg_decrypted:",msg_decrypted,"\n"
-                );
-                return msg_decrypted;
+                response.send(msg_decrypted);
             })
             .catch(function(error) {
                 console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
