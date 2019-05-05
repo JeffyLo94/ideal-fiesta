@@ -13,9 +13,9 @@
 
         <!-- -->
         <div class="ls header-logo" *ngIf="displayLogo">
-        <a target="_self" href="/" class="header-logo-link">
-            <img class="header-logo-link-img">
-        </a>
+            <a target="_self" href="/" class="header-logo-link" *ngIf="displayLogo">
+                <img class="header-logo-link-img" *ngIf="displayLogo">
+            </a>
         </div>
         <div class="ls header-label">
         <span class="header-label-text">{{ label | uppercase }}</span>
@@ -29,33 +29,33 @@
     </div>
     <div class="header-rightSide">
         <div class="rs header-account" *ngIf="hasLogin">
-        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="header-menu-card">
-            <!-- This needs some authentication component -->
-            <span style="width:24px" *ngIf="user.avatarUrl;else useIcon">
-            <img src={{user.avatarUrl}} alt="">
-            </span>
-            <ng-template #useIcon>
-            <span style="width:24px" class="material-icons">account_circle_outline</span>
-            </ng-template>
-        </button>
-        <mat-menu #userMenu="matMenu" class="header-mat-menu">
-            <span mat-menu-item *ngIf="user">
-            <img *ngIf="user.avatarUrl;else useIcon" src={{user.avatarUrl}} alt="">
-            <ng-template #useIcon>
-                <mat-icon class="material-icons">account_circle_outline</mat-icon>
+            <button mat-icon-button [matMenuTriggerFor]="userMenu" class="header-menu-card">
+                <!-- This needs some authentication component -->
+                <span style="width:24px" *ngIf="user;else useIcon">
+                    <img src={{user.avatarUrl}} alt="">
+                </span>
+                <ng-template #useIcon>
+                    <span style="width:24px" class="material-icons">account_circle_outline</span>
                 </ng-template>
-            <span class="menu-button-text">{{ user.name }}</span>
-            </span>
-            <button mat-menu-item *ngIf="user" (click)="handleLogout()">
-            <mat-icon class="material-icons">power_settings_new</mat-icon>
-            <span class="menu-button-text">Logout</span>
             </button>
-            <button mat-menu-item *ngIf="!user" (click)="handleLogin()">
-                <span class="menu-button-text">Log In</span>
-            </button>
-        </mat-menu>
+            <mat-menu #userMenu="matMenu" class="header-mat-menu">
+                <span mat-menu-item *ngIf="user">
+                    <img *ngIf="user.avatarUrl;else useIcon" src={{user.avatarUrl}} alt="">
+                    <ng-template #useIcon>
+                        <mat-icon class="material-icons">account_circle_outline</mat-icon>
+                        </ng-template>
+                    <span class="menu-button-text">{{ user.name }}</span>
+                </span>
+                <button mat-menu-item *ngIf="user" (click)="handleLogout()">
+                    <mat-icon class="material-icons">power_settings_new</mat-icon>
+                    <span class="menu-button-text">Logout</span>
+                </button>
+                <button mat-menu-item *ngIf="!user" (click)="handleLogin()">
+                    <span class="menu-button-text">Log In</span>
+                </button>
+            </mat-menu>
         </div>
-        <div class="rs header-help"><a>Help</a></div>
+        <!-- <div class="rs header-help"><a>Help</a></div> -->
         <div class="rs header-fullscreen">
         <button class="header-button" (click)="toggleFullscreen()">
             <span class="material-icons">{{fullscreenIcon}}</span>

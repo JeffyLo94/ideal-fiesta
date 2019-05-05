@@ -44,7 +44,8 @@ export class HeaderComponent implements OnInit {
     this.elem = this.doc.documentElement;
 
     this.elem.webkitIsFullScreen ? (this.fullscreenIcon = this.FS_DISABLE) : (this.fullscreenIcon = this.FS_ENABLE);
-
+    console.log(this.displayLogo);
+    console.log('HEADER -- ',this.user)
     console.log(this.fullscreenIcon);
   }
 

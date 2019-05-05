@@ -19,6 +19,7 @@ body {
 *::after {
   font-family: "Roboto", "Helvetica Neue", sans-serif;
   box-sizing: border-box;
+  color: $idf-text-color;
 }
 
 // fixes a bug with material-icons having strange overflows and click areas

@@ -137,6 +137,7 @@
   
       .header-link-text {
         transition: all 1s ease 0s;
+        padding-left: 5px;
       }
     }
   
@@ -218,7 +219,7 @@
       margin: auto;
       border: none;
       border-width: 0px;
-      content: "IDF-Chat";
+      content: url('/assets/logo/idf-white.svg');
       transition: all 1s ease 0s;
     }
   
@@ -236,7 +237,7 @@
     .header-logo-link-img{
       width: 100px;
       margin: auto;
-      content: "IDF-Chat";
+      content: url('/assets/logo/idf-white.svg');
       transition: all 1s ease 0s;
     }
   

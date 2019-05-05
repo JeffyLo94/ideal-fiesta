@@ -24,19 +24,26 @@ export class AppComponent implements OnInit{
   }
 
   appLinks = [];
-  currUser: HeaderUser;
+  currUser: HeaderUser = {
+    avatarUrl: '',
+    name: ''
+  };
 
-  constructor(private readonly router: Router, private readonly fbAuth: AuthService) {}
-
-  ngOnInit() {
-     if (this.fbAuth.isLoggedIn) {
+  constructor(private readonly router: Router, private readonly fbAuth: AuthService) {
+    console.log(this.currUser);
+    if (this.fbAuth.isLoggedIn) {
       const fbUser = this.fbAuth.currentUser;
       this.currUser.name = fbUser.email;
+      this.currUser.avatarUrl = '';
       this.appLinks = [this.chatLink];
     } else {
       this.appLinks = [this.signUpLink];
       this.currUser = null;
     }
+  }
+
+  ngOnInit() {
+
   }
 
   handleLogin(e) {
