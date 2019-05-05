@@ -64,7 +64,7 @@ app.post('/genpair', (request, response) => {
 Retrieve the list of conversation ids a given user belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/getconvos', (request, response) => {
-    var func_name = "/getconvos ->"
+    var func_name = "/getconvos ->";
     var user_id = request.body.UID;
     var conversations = [];
     db.collection('users').doc(user_id).get()
@@ -83,18 +83,18 @@ app.post('/getconvos', (request, response) => {
 Retrieve a message and perform decryption twice.
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/getmsg', (request, response) => {
-    var func_name = "/getmsg ->"
+    var func_name = "/getmsg ->";
     var message_id = request.body.message_id;
-    /*
-    db.collection('users').doc(user_id).get()
+    var timestamp;
+    db.collection('messages').doc(message_id).get()
     .then(function(doc) {
-        conversations = doc.data().conversations;
-        response.send(conversations);
+        timestamp = doc.data().creation_time;
+        timestamp = timestamp.toString();
+        response.send(timestamp);
     })
     .catch(function(error) {
         console.error(func_name,"ERROR:",error);
     });;
-    */
 });
 
 
