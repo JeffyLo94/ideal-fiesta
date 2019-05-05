@@ -48,14 +48,14 @@ Control flow # 2.0
 Generate a public/private key pair
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/genpair', (request, response) => {
-  console.log("/genpair");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var pair = keypair();
-  console.log("\tPublic: ", pair.public);
-  console.log("\tPrivate: ", pair.private);
-  setPublicKey(request.body.UID, pair.public)
-  response.send(pair);
+    var func_name = "/genpair ->";
+    var uid = request.body.UID;
+    console.log("\tUID: ", uid);
+    var pair = keypair();
+    console.log(func_name,"Public:", pair.public);
+    console.log(func_name,"Private:", pair.private);
+    setPublicKey(request.body.UID, pair.public)
+    response.send(pair);
 });
 
 
@@ -67,8 +67,14 @@ app.post('/getconvos', (request, response) => {
     var func_name = "/getconvos ->"
     var user_id = request.body.UID;
     var conversations = [];
-    console.log(func_name,"UID:",user_id);
-    response.send(conversations);
+    db.collection('users').doc(user_id).get()
+    .then(function(doc) {
+        conversations = doc.data().conversations;
+        response.send(conversations);
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:",error);
+    });;
 });
 
 
@@ -113,7 +119,8 @@ app.post('/newconvo', (request, response) => {
         for(var i = 0; i < ReceiverUID.length; i++) {
             //var receiver_uid = ReceiverUID[i];
             console.log("\treceiver_uid: ",ReceiverUID[i]);
-            db.collection('users').doc(ReceiverUID[i]).get().then(function(doc) {
+            db.collection('users').doc(ReceiverUID[i]).get().
+            then(function(doc) {
                 //console.log("\tsender_public_key: ",doc.data().public_key);
 
                 var receiver_uid = doc.id;
@@ -174,12 +181,12 @@ app.post('/newuser', (request, response) => {
 Mark a user offline
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/setoffline', (request, response) => {
-  console.log("/setoffline");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({online:false});
-  response.send("OK");
+    console.log("/setoffline");
+    var uid = request.body.UID;
+    console.log("\tUID: ", uid);
+    var userRef = db.collection('users').doc(uid);
+    var updateSingle = userRef.update({online:false});
+    response.send("OK");
 });
 
 
@@ -189,12 +196,12 @@ Control flow # 7.0
 Mark a user online
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/setonline', (request, response) => {
-  console.log("/setonline");
-  var uid = request.body.UID;
-  console.log("\tUID: ", uid);
-  var userRef = db.collection('users').doc(uid);
-  var updateSingle = userRef.update({online:true});
-  response.send("OK");
+    console.log("/setonline");
+    var uid = request.body.UID;
+    console.log("\tUID: ", uid);
+    var userRef = db.collection('users').doc(uid);
+    var updateSingle = userRef.update({online:true});
+    response.send("OK");
 });
 
 
@@ -204,14 +211,14 @@ Control flow # 4.0 & 5.0
 Encrypt and return a user's private key
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/submitpin', (request, response) => {
-  console.log("/submitpin");
-  var pin     = request.body.PIN;
-  var private = request.body.PRIVATE;
-  var encrypted = aes256.encrypt(pin,private);
-  console.log("\tPIN: ", pin);
-  console.log("\tPRIVATE: ", private);
-  console.log("\tEncrypted Private: ", encrypted);
-  response.send(encrypted);
+    console.log("/submitpin");
+    var pin     = request.body.PIN;
+    var private = request.body.PRIVATE;
+    var encrypted = aes256.encrypt(pin,private);
+    console.log("\tPIN: ", pin);
+    console.log("\tPRIVATE: ", private);
+    console.log("\tEncrypted Private: ", encrypted);
+    response.send(encrypted);
 });
 
 
