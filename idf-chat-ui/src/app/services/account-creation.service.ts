@@ -1,40 +1,22 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { User } from '../chat-objects.model';
+import { Injectable } from '@angular/core';
 import { FirestoreService } from './firestore.service';
-import { AuthService } from './auth.service';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { takeUntil, map } from 'rxjs/operators';
+import { User } from '../chat-objects.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AccountCreationService implements OnDestroy {
-  user: User;
+export class AccountCreationService {
 
-  userListData: BehaviorSubject<User[]> = new BehaviorSubject([]);
-  userList$: Observable<User[]> = this.userListData.asObservable();
+  users: User[];
 
-  private destroy$: Subject<boolean> = new Subject<boolean>();
-
-  constructor(private fs: FirestoreService, private as: AuthService) {
-
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  requestUsersFromDatabase() {
-    return this.fs.getUsers().pipe(
-      takeUntil(this.destroy$),
-      map( (users) => {
-        return users.map( (a) => {
-            const userData = a.payload.doc.data();
-            const id = a.payload.doc.id;
-          }
-        );
+  constructor(private fs: FirestoreService) {
+    this.fs.getUsers().subscribe( data => {
+      let a = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          email: e.payload.doc.get('email')
+        }
       })
-    ).subscribe();
+    });
   }
 }

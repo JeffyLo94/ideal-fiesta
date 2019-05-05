@@ -10,7 +10,8 @@ import { MatToolbarModule,
   MatLabel,
   MatFormFieldModule,
   MatInputModule,
-  MatIconModule
+  MatIconModule,
+  MatMenuModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -72,7 +73,6 @@ let fbconfig = {
     AngularFireModule.initializeApp(fbconfig),
     AngularFireAuthModule,
     AngularFireDatabaseModule,
-    AngularFirestore,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
@@ -82,9 +82,10 @@ let fbconfig = {
     MatListModule,
     MatIconModule,
     MatCardModule,
-    MatButtonModule,
+    // MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
     ReactiveFormsModule
   ],
   providers: [],
