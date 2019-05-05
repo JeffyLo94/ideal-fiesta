@@ -61,7 +61,7 @@ app.post('/genpair', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Retrieve the list of conversations a user belongs to.
+Retrieve the list of conversation ids a given user belongs to.
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/getconvos', (request, response) => {
     var func_name = "/getconvos ->"
@@ -75,6 +75,26 @@ app.post('/getconvos', (request, response) => {
     .catch(function(error) {
         console.error(func_name,"ERROR:",error);
     });;
+});
+
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Retrieve a message and perform decryption twice.
+/////////////////////////////////////////////////////////////////////////////*/
+app.post('/getmsg', (request, response) => {
+    var func_name = "/getmsg ->"
+    var message_id = request.body.message_id;
+    /*
+    db.collection('users').doc(user_id).get()
+    .then(function(doc) {
+        conversations = doc.data().conversations;
+        response.send(conversations);
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:",error);
+    });;
+    */
 });
 
 
