@@ -111,58 +111,42 @@ Control flow # 8.0.b. -> 8.4
 Starting a new conversation
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/newconvo', (request, response) => {
-    var func_name = "/newconvo";
+    var func_name = "/newconvo ->";
     // Unpackage and document the request /////////////////////////////////////
-    var SenderUID = request.body.SenderUID;
-    var ReceiverUID = request.body.ReceiverUID;
-    var SenderPrivate = request.body.SenderPrivate;
-    var Title = request.body.Title;
-    var Msg = request.body.Msg;
-    console.log(func_name,"-> sender_uid:", SenderUID);
-    console.log(func_name,"-> title:", Title);
-    console.log(func_name,"-> msg:", Msg);
-    var creation_time = Date.now();
-    var convoID;
-    db.collection("conversations").add({
+    var sender_id = request.body.sender_id;
+    var receiver_list = request.body.receiver_list;
+    var title = request.body.title;
+    var msg = request.body.msg;
+    console.log(func_name,"sender_id:", sender_id);
+    console.log(func_name,"title:", title);
+    console.log(func_name,"msg:", msg);
+    var timestamp = Date.now();
+    var conversation_id;
+    db.collection('conversations').add({
         // Make a new conversation object /////////////////////////////////////
-        title: Title,
-        receiver_uid_list: ReceiverUID,
-        creator_uid: SenderUID,
-        creation_time: creation_time,
-        message_id_list:[],
+        title: title,
+        receiver_list: receiver_list,
+        creator_uid: sender_id,
+        timestamp: timestamp,
+        message_list:[],
     })
     .then(function(docRef) {
         // Upon creation, perform encryption and post the first message ///////
-        convoID = docRef.id;
-        console.log(func_name,"-> SUCCESS: ID:", convoID);
-
-        AddConversationToUser(convoID,SenderUID);
-
-        // Perform first encryption layer
-        Msg = creation_time + Msg;
-        var SenderEMsg = aes256.encrypt(SenderPrivate, Msg);
-
+        conversation_id = docRef.id;
+        console.log(func_name,"SUCCESS: ID:", conversation_id);
+        AddConversationToUser(conversation_id,sender_id);
         // Gather the public keys of every user in the conversation
-        for(var i = 0; i < ReceiverUID.length; i++) {
-            //var receiver_uid = ReceiverUID[i];
-            console.log("\treceiver_uid: ",ReceiverUID[i]);
-            db.collection('users').doc(ReceiverUID[i]).get().
+        for(var i = 0; i < receiver_list.length; i++) {
+            db.collection('users').doc(receiver_list[i]).get().
             then(function(doc) {
-                //console.log("\tsender_public_key: ",doc.data().public_key);
-
-                var receiver_uid = doc.id;
-
-                AddConversationToUser(convoID,receiver_uid);
-
-                var pin = doc.data().public_key;
-                var private = SenderEMsg;
-                var sender_ee_msg = aes256.encrypt(pin, private);
-
+                var receiver_id = doc.id;
+                AddConversationToUser(conversation_id,receiver_id);
                 sendMessage(
-                    sender_ee_msg,
-                    creation_time,
-                    receiver_uid,
-                    SenderUID,convoID
+                    conversation_id,
+                    msg,
+                    receiver_id,
+                    sender_id,
+                    timestamp
                 );
             });
         }
@@ -170,7 +154,7 @@ app.post('/newconvo', (request, response) => {
     .catch(function(error) {
         console.error(func_name,"-> ERROR:", error);
     });
-    response.send(convoID);
+    response.send(conversation_id);
 });
 
 
@@ -224,33 +208,19 @@ Send a message
 app.post('/sendmsg',(request, response) => {
     var func_name = "/sendmsg ->";
     // Capture information from the request ///////////////////////////////////
-    var conversation_id = request.body.conversation;
+    var conversation_id = request.body.conversation_id;
     var msg = request.body.msg;
     var receiver_id = request.body.receiver_id;
     var sender_id = request.body.sender_id;
     var timestamp = Date.now();
-    // Get dependencies ///////////////////////////////////////////////////////
-    var sender_public = getpublic(sender_id);
-    var receiver_public = getpublic(receiver_id);
-    // Encrypt the message ////////////////////////////////////////////////////
-    var msg_encrypted = aes256.encrypt(sender_public+receiver_public,msg);
     // Perform the transaction ////////////////////////////////////////////////
-    db.collection('messages').add({
-        conversation_id:conversation_id,
-        msg_encrypted:msg_encrypted,
-        receiver_id:receiver_id,
-        sender_id:sender_id,
-        timestamp:timestamp
-    })
-    .then(function(docRef) {
-        message_id = docRef.id;
-        console.log(func_name,"SUCCESS: ID:", message_id);
-        // Add the new message's id into the conversation it belongs to ///////
-        AddMessageToConversation(message_id,conversation_id);
-    })
-    .catch(function(error) {
-        console.error(func_name,"ERROR:", error);
-    });
+    sendMessage(
+        conversation_id,
+        msg,
+        receiver_id,
+        sender_id,
+        timestamp
+    );
 });
 
 
@@ -340,16 +310,37 @@ function AddMessageToConversation(message_id, conversation_id) {
     var func_name = "AddMessageToConversation() ->";
     console.log(func_name,"message_id:",message_id);
     console.log(func_name,"conversation_id:",conversation_id);
-    var existing_message_id_list = [];
+    var existing_message_list = [];
     db.collection('conversations').doc(conversation_id).get()
-    .then(function(doc, existing_message_id_list) {
+    .then(function(doc, existing_message_list) {
         console.log(func_name,"conversation",conversation_id,"has",
-            doc.data().message_id_list.length,"existing messages"
+            doc.data().message_list.length,"existing messages"
         );
-        existing_message_id_list = doc.data().message_id_list;
-        existing_message_id_list.push(message_id);
+        existing_message_list = doc.data().message_list;
+        existing_message_list.push(message_id);
         var convoRef = db.collection('conversations').doc(conversation_id);
-        convoRef.update({message_id_list: existing_message_id_list});
+        convoRef.update({message_list: existing_message_list});
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR:",error);
+    });;
+}
+
+
+/*/////////////////////////////////////////////////////////////////////////////
+Find and return a specified user's public key
+/////////////////////////////////////////////////////////////////////////////*/
+function getPublic(user_id) {
+    var func_name = "getPublic() ->";
+    db.collection('users').doc(user_id).get()
+    .then(function(doc) {
+        var public_key = doc.data().public_key;
+        console.log(
+            func_name,"\n",
+            "\t","user_id:",user_id,"\n",
+            "\t","public_key:",public_key,"\n"
+        );
+        return public_key;
     })
     .catch(function(error) {
         console.error(func_name,"ERROR:",error);
@@ -361,32 +352,47 @@ function AddMessageToConversation(message_id, conversation_id) {
 /*/////////////////////////////////////////////////////////////////////////////
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
-function sendMessage(SenderEEMsg, creation_time, ReceiverUID, SenderUID, conversation_id) {
-  var func_name = "sendMessage() ->";
-  console.log(func_name,"creation_time:",creation_time);
-  console.log(func_name,"conversation_id:", conversation_id);
-  console.log(func_name,"receiver_uid:", ReceiverUID);
-  console.log(func_name,"sender_uid:", SenderUID);
-  // Create a place to store the message id after it has been created
-  var message_id;
-  // Post the message
-  db.collection("messages").add({
-      sender_ee_msg: SenderEEMsg,
-      creation_time: creation_time,
-      receiver_uid: ReceiverUID,
-      sender_uid: SenderUID,
-      receiver_read: false
-  })
-  .then(function(docRef) {
-      message_id = docRef.id;
-      console.log(func_name,"SUCCESS: ID:", message_id);
-      // Add the new message's id into the conversation it belongs to
-      AddMessageToConversation(message_id,conversation_id);
-  })
-  .catch(function(error) {
-      console.error(func_name,"ERROR:", error);
-  });
-  return message_id;
+function sendMessage(
+    conversation_id,msg,receiver_id,sender_id,timestamp) {
+    var func_name = "sendMessager() ->";
+    // First get sender's public key //////////////////////////////////////////
+    db.collection('users').doc(sender_id).get()
+    .then(function(doc) {
+        var sender_public = doc.data().public_key;
+        // Next get receiver's public key /////////////////////////////////////
+        db.collection('users').doc(receiver_id).get()
+        .then(function(doc) {
+            var receiver_public = doc.data().public_key;
+            // Encrypt the message ////////////////////////////////////////////
+            var msg_encrypted = aes256.encrypt(
+                sender_public+receiver_public,msg
+            );
+            // Now finally send the message ///////////////////////////////////
+            db.collection('messages').add({
+                conversation_id:conversation_id,
+                msg_encrypted:msg_encrypted,
+                receiver_id:receiver_id,
+                receiver_read:false,
+                sender_id:sender_id,
+                timestamp:timestamp
+            })
+            .then(function(docRef) {
+                var message_id = docRef.id;
+                console.log(func_name,"SUCCESS: ID:", message_id);
+                // Add the new message's id into the conversation it belongs to
+                AddMessageToConversation(message_id,conversation_id);
+            })
+            .catch(function(error) {
+                console.error(func_name,"ERROR ADDING MESSAGE DOC:", error);
+            });
+        })
+        .catch(function(error) {
+            console.error(func_name,"ERROR GETTING RECEIVER DOC:",error);
+        });;
+    })
+    .catch(function(error) {
+        console.error(func_name,"ERROR GETTING SENDER DOC:",error);
+    });;
 }
 
 
