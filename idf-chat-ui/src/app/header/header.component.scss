@@ -1,43 +1,252 @@
 @import 'variables';
 
-mat-toolbar {
+/* ----- Header Styling ----- */
+
+.app-header {
     height: $header-height;
-}
-
-.navbar {
     display: flex;
-    justify-content: flex-start;
-}
-
-.logo {
-    max-width: 15%;
-}
-
-.page-links {
+    background-color: $idf-dark-header;
+    color: rgb(198,198,198);
+  }
+  
+  .app-header * {
     display: flex;
-    justify-content: flex-end;
-    width: 70%;
-}
-
-.link {
+  }
+  
+  .header-button {
+    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+    background-color: $idf-dark-header;
+    border: $idf-dark-header;
+    outline:none;
+  
+    &:hover {
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+      z-index: 8;
+    }
+  
+    &:active {
+      z-index: 7;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+  }
+  
+  .header-logo {
+    max-width: fit-content;
+  }
+  
+  .header-logo-link {
+    height: auto;
+    max-width: fit-content;
+  }
+  
+  .header-logo-link-img {
+    height: 50%;
+    display: block;
+    margin: auto;
+  }
+  
+  .header-link {
     margin-right: 1rem;
     outline: 0;
-}
-
-.link:hover {
-    cursor: pointer;
-}
-
-.plain-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.view {
-    margin-left: 3rem;
-    width: 15%;
-}
-
-.nav-item:hover {
-    cursor: pointer;
-}
+    border-bottom: 5px solid $idf-dark-header;
+    font-size: 1.15rem;
+    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+  
+  
+    &:hover {
+      cursor: pointer;
+      border-bottom: 5px solid $idf-current-selection;
+    }
+  
+    &:active {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+  }
+  
+  .header-link-active {
+    border-bottom: 5px solid $idf-current-state;
+  
+    &:hover {
+      cursor: default;
+      border-bottom: 5px solid $idf-current-state;
+    }
+  }
+  
+  .header-menu-card {
+    // box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), 0 1px 0 rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
+    background-color: $idf-dark-header;
+    border: $idf-dark-header;
+    outline:none;
+  
+    &:hover {
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+      z-index: 8;
+    }
+  
+    &:active {
+      z-index: 7;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    }
+  }
+  
+  .header-navBar {
+    margin-top: 14px !important;
+  }
+  
+  .header-leftSide {
+    height: 100%;
+    justify-content: flex-start;
+    min-width: 75%;
+  }
+  
+  .header-rightSide {
+    height: 100%;
+    justify-content: flex-end;
+    min-width: 25%;
+  }
+  
+  .menu-button-text  {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .rs {
+    &:not(:last-of-type):not(.header-account) {
+      padding-right: 20px;
+      padding-left: 20px;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+  }
+  
+  .ls {
+    &:not(:first-of-type) {
+      padding-left: 20px;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+  }
+  
+  /* ----- Overrides ----- */
+  
+  
+  /* ----- Media Queries ----- */
+  @media (min-width: 1001px) {
+    .header-link {
+      transition: all 1s ease 0s;
+  
+      .header-link-text {
+        transition: all 1s ease 0s;
+      }
+    }
+  
+    .header-label-text {
+      transition: all 1s ease 0s;
+    }
+  }
+  
+  @media (max-width: 1000px) {
+  
+    .header-link  {
+      padding-left: 0;
+      padding-right: 0;
+      transition: all 1s ease 0s;
+  
+      .header-link-text {
+        width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        font-size: 0;
+        transition: all 1s ease 0s;
+      }
+    }
+  
+    // .header-label-text {
+    //   padding-left: 10px;
+    //   transition: all 1s ease 0s;
+    // }
+  }
+  
+  @media (min-width: 701px) {
+    .header-logo {
+      transition: all 1s ease 0s;
+    }
+  
+    .navMenuButton {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0;
+      transition: all 1s ease 0s;
+    }
+  
+    .header-navBar {
+      transition: all 1s ease 0s;
+    }
+  }
+  
+  @media (max-width: 700px) {
+    .header-logo {
+      padding-left: 20px;
+      transition: all 1s ease 0s;
+    }
+  
+    .navMenuButton {
+      transition: all 1s ease 0s;
+    }
+  
+    .header-navBar  {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 1s ease 0s;
+    }
+  }
+  
+  @media (min-width: 651px) {
+    .header-help a {
+      font-size: 1.25rem;
+      transition: all 1s ease 0s;
+    }
+  
+    .header-logo-link-img{
+      width: 150px;
+      height: 40px;
+      margin: auto;
+      border: none;
+      border-width: 0px;
+      content: "IDF-Chat";
+      transition: all 1s ease 0s;
+    }
+  
+    .header-label {
+      transition: all 1s ease 0s;
+    }
+  }
+  
+  @media (max-width: 650px) {
+    .header-help a {
+      font-size: 1.1rem;
+      transition: all 1s ease 0s;
+    }
+  
+    .header-logo-link-img{
+      width: 100px;
+      margin: auto;
+      content: "IDF-Chat";
+      transition: all 1s ease 0s;
+    }
+  
+    .header-label {
+      visibility: hidden;
+      opacity: 0;
+      transition: all 1s ease 0s;
+    }
+  }
+  
+  // @media (max-width:500px) {
+  
+  // }

@@ -1,5 +1,5 @@
 <!-- <app-header></app-header> -->
-
+<app-header label="IDF-Chat" displayLogo="false" [links]="appLinks" hasLogin="true" [user]="currUsr" (login)="handleLogin($event)" (logout)="handleLogout($event)"></app-header> 
 <main>
   <router-outlet></router-outlet>
 </main>
