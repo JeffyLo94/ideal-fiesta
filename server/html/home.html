@@ -1,23 +1,28 @@
 <!doctype html>
-
 <html lang="en">
-	<head>
-		<title>
-			IdealFiesta Chat
-		</title>
-	</head>
-	<body>
-		<h1>
-			Welcome to IdealFiesta Chat!
-		</h1>
-		<form action="/send" method="get" id="new_message">
-			To<br>
-			<input type="text" name="to"><br>
-			Message<br>
-			<input type="text" name="message">
-		</form>
-		<button type="submit" form="new_message" value="Submit">
-			Submit
-		</button>
-	</body>
+				<head>
+								<title>
+												IdealFiesta Chat
+								</title>
+				</head>
+				<body>
+								<h1>
+												Welcome to IdealFiesta Chat!
+								</h1>
+								<form action="/sendmsg" method="get" id="new_message" method="post">
+												To<br>
+												<input type="text" name="receiver_id"><br>
+												From<br>
+												<input type="text" name="sender_id"><br>
+												Conversation<br>
+												<input type="text" name=" conversation_id"><br>
+												Pin<br>
+												<input type="text" name="pin"><br>
+												Message<br>
+												<input type="text" name="msg">
+								</form>
+								<button type="submit" form="new_message" value="Submit">
+												Submit
+								</button>
+				</body>
 </html>
