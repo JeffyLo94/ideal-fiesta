@@ -236,25 +236,6 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Test encryption and decryption
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/testaes', (request, response) => {
-    console.log("/testaes");
-    //var pin     = request.body.PIN;
-    //var private = request.body.PRIVATE;
-    var encrypted = aes256.encrypt("GYnACAngG+qQm2r1DKsbXeg6UgK+H+L9/g==OFytRX4wPit3aBvGLF6CHzsPBueeu4Bd/w==","mymessage");
-    console.log("encrypted",encrypted);
-    var decrypted = aes256.decrypt("GYnACAngG+qQm2r1DKsbXeg6UgK+H+L9/g==OFytRX4wPit3aBvGLF6CHzsPBueeu4Bd/w==",encrypted);
-    console.log("decrypted",decrypted);
-    //console.log("\tPIN: ", pin);
-    //console.log("\tPRIVATE: ", private);
-    //console.log("\tEncrypted Private: ", encrypted);
-    response.send(decrypted);
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
 Anytime a conversation is created, we add the new conversation id to the
 sender's and recevier's user document.
 /////////////////////////////////////////////////////////////////////////////*/
