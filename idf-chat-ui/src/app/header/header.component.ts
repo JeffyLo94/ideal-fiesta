@@ -1,5 +1,7 @@
-import { Component, OnInit, Input, ViewEncapsulation, Inject, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation, Inject, EventEmitter, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { FirebaseAuth } from '@angular/fire';
+import { BehaviorSubject } from 'rxjs';
 // import { User } from 'firebase';
 
 export interface HeaderLink {
@@ -19,6 +21,7 @@ export interface HeaderUser {
   // encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent implements OnInit {
+
   @Input() links: HeaderLink[];
   @Input() displayLogo: boolean;
   @Input() label: string;
@@ -35,6 +38,8 @@ export class HeaderComponent implements OnInit {
   private elem;
   fullscreenIcon = 'fullscreen';
 
+  destroy$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
 
   constructor(@Inject(DOCUMENT) private readonly doc: any) {
     this.fullscreenIcon = 'fullscreen';
@@ -45,19 +50,27 @@ export class HeaderComponent implements OnInit {
 
     this.elem.webkitIsFullScreen ? (this.fullscreenIcon = this.FS_DISABLE) : (this.fullscreenIcon = this.FS_ENABLE);
     console.log(this.displayLogo);
-    console.log('HEADER -- ',this.user)
+    console.log('HEADER -- ', this.user);
     console.log(this.fullscreenIcon);
+
   }
 
+  // ngOnChanges( changes: SimpleChanges) {
+  //   console.log(changes);
+  // }
+  // ngOnDestroy() {
+  //   this.destroy$.next(true);
+  //   this.destroy$.complete();
+  // }
+
   handleLogin() {
-    console.log('login pressed - TODO change when authentication implemented');
-    //emit event here
+    console.log('login pressed');
     this.login.emit();
   }
 
   handleLogout() {
-    console.log('logout pressed - TODO change when authentication implemented');
-    this.login.emit();
+    console.log('logout pressed');
+    this.logout.emit();
   }
 
   toggleFullscreen() {

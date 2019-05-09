@@ -106,9 +106,9 @@
     min-width: 25%;
   }
   
-  .menu-button-text  {
-    color: rgba(0, 0, 0, 0.6);
-  }
+  // .menu-button-text  {
+  //   color: $idf-text;
+  // }
   
   .rs {
     &:not(:last-of-type):not(.header-account) {

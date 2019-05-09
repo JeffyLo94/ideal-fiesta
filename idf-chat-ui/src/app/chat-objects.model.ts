@@ -31,6 +31,6 @@ export interface Convos {
   title: string;
   members: string[];                          // array of uids
   messages: Map<string, EEncryptedMessage[]>; // dictionary object with <uid, Message[]> key value pair
-  lastUpdated: Date;
-  createdOn: Date;
+  lastUpdated: number;
+  createdOn: number;
 }

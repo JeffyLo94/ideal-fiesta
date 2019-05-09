@@ -1,7 +1,7 @@
 <mat-toolbar class="app-header">
     <div class="header-leftSide">
         <!-- Mini Menu-->
-        <button id="navMenuButton" mat-icon-button [matMenuTriggerFor]="menu" class="header-menu-card navMenuButton">
+        <button id="navMenuButton" [matMenuTriggerFor]="menu" class="header-menu-card navMenuButton">
             <span class="material-icons">menu</span>
         </button>
         <mat-menu #menu="matMenu" class="header-mat-menu">
@@ -29,9 +29,9 @@
     </div>
     <div class="header-rightSide">
         <div class="rs header-account" *ngIf="hasLogin">
-            <button mat-icon-button [matMenuTriggerFor]="userMenu" class="header-menu-card">
+            <button [matMenuTriggerFor]="userMenu" class="header-menu-card">
                 <!-- This needs some authentication component -->
-                <span style="width:24px" *ngIf="user;else useIcon">
+                <span style="width:24px" *ngIf="user && user.avatarUrl !== '';else useIcon">
                     <img src={{user.avatarUrl}} alt="">
                 </span>
                 <ng-template #useIcon>
