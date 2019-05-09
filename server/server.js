@@ -260,27 +260,6 @@ app.post('/setonline', (request, response) => {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-testaes
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/testaes', (request, response) => {
-    var plain1 = "My text";
-    var pin1 = "12345";
-    var encrypt1 = aes256.encrypt(pin1,plain1);
-
-    var plain2 = "My text";
-    var pin2 = "12345";
-    var encrypt2 = aes256.encrypt(pin2,plain2);
-
-    console.log(encrypt1);
-    console.log(encrypt2);
-
-    var decrypt1 = aes256.decrypt(pin1,encrypt1);
-    console.log(decrypt1);
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
 Anytime a conversation is created, we add the new conversation id to the
 sender's and recevier's user document.
 /////////////////////////////////////////////////////////////////////////////*/
@@ -349,7 +328,7 @@ function getMessage(
             var receiver_public = doc.data().public_key;
             db.collection('messages').doc(message_id).get()
             .then(function(doc) {
-                // Decrypt the message ////////////////////////////////////////////
+                // Decrypt the message ////////////////////////////////////////
                 var msg_encrypted = doc.data().msg_encrypted;
                 var msg_decrypted = aes256.decrypt(
                     sender_public+receiver_public,msg_encrypted
