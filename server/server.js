@@ -109,48 +109,60 @@ Starting a new conversation
 app.post('/newconvo', (request, response) => {
     var func_name = "/newconvo ->";
     // Unpackage and document the request /////////////////////////////////////
-    var sender_id = request.body.sender_id;
-    var receiver_list = request.body.receiver_list;
-    var title = request.body.title;
     var msg = request.body.msg;
-    console.log(func_name,"sender_id:", sender_id);
-    console.log(func_name,"title:", title);
-    console.log(func_name,"msg:", msg);
-    var timestamp = Date.now();
-    var conversation_id;
-    db.collection('conversations').add({
-        // Make a new conversation object /////////////////////////////////////
-        title: title,
-        receiver_list: receiver_list,
-        creator_uid: sender_id,
-        timestamp: timestamp,
-        message_list:[],
-    })
-    .then(function(docRef) {
-        // Upon creation, perform encryption and post the first message ///////
-        conversation_id = docRef.id;
-        console.log(func_name,"SUCCESS: ID:", conversation_id);
-        AddConversationToUser(conversation_id,sender_id);
-        // Gather the public keys of every user in the conversation
-        for(var i = 0; i < receiver_list.length; i++) {
-            db.collection('users').doc(receiver_list[i]).get().
-            then(function(doc) {
-                var receiver_id = doc.id;
-                AddConversationToUser(conversation_id,receiver_id);
-                sendMessage(
-                    conversation_id,
-                    msg,
-                    receiver_id,
-                    sender_id,
-                    timestamp
-                );
-            });
-        }
-    })
-    .catch(function(error) {
-        console.error(func_name,"-> ERROR:", error);
-    });
-    response.send(conversation_id);
+    var pin = request.body.pin;
+    var receiver_list = request.body.receiver_list;
+    var sender_id = request.body.sender_id;
+    var title = request.body.title;
+    if(pin != null) {
+       console.log(func_name,"msg:", msg);
+       console.log(func_name,"pin:", pin);
+       console.log(func_name,"sender_id:", sender_id);
+       console.log(func_name,"title:", title);
+       var timestamp = Date.now();
+       var conversation_id;
+       db.collection('conversations').add({
+           // Make a new conversation object /////////////////////////////////////
+           title: title,
+           receiver_list: receiver_list,
+           creator_uid: sender_id,
+           timestamp: timestamp,
+           message_list:[],
+       })
+       .then(function(docRef) {
+           // Upon creation, perform encryption and post the first message ///////
+           conversation_id = docRef.id;
+           console.log(func_name,"SUCCESS: ID:", conversation_id);
+           AddConversationToUser(conversation_id,sender_id);
+           // Gather the public keys of every user in the conversation
+           for(var i = 0; i < receiver_list.length; i++) {
+               db.collection('users').doc(receiver_list[i]).get().
+               then(function(doc) {
+                   var receiver_id = doc.id;
+                   AddConversationToUser(conversation_id,receiver_id);
+                   sendMessageAndPin(
+                       conversation_id,
+                       msg,
+                       receiver_id,
+                       sender_id,
+                       timestamp,
+                       pin,
+                       response
+                   );
+               });
+           }
+       })
+       .catch(function(error) {
+           console.error(func_name,"-> ERROR:", error);
+       });
+       response.send(conversation_id);
+    }
+    else {
+       var result_msg = func_name + " ERROR: SENDER'S PIN REQUIRED";
+       response.send(result_msg);
+       console.log(result_msg);
+    }
+
 });
 
 
@@ -227,7 +239,8 @@ app.post('/sendmsgandpin',(request, response) => {
         receiver_id,
         sender_id,
         timestamp,
-        pin
+        pin,
+        response
     );
 });
 
@@ -436,7 +449,8 @@ Given a conversation, plaintext message, receiver, sender, timestamp and pin,
 verify the correct pin, encrypt the message and create the new message document.
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessageAndPin(
-    conversation_id,msg,receiver_id,sender_id,timestamp,sender_provided_pin) {
+    conversation_id,msg,receiver_id,sender_id,
+    timestamp,sender_provided_pin,response) {
     var func_name = "sendMessageAndPin() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
@@ -465,9 +479,11 @@ function sendMessageAndPin(
                })
                .then(function(docRef) {
                    var message_id = docRef.id;
-                   console.log(func_name,"SUCCESS: ID:", message_id);
                    // Record the new id into the correct conversation /////////
                    AddMessageToConversation(message_id,conversation_id);
+                   var result_msg = func_name + " SUCCESS: ID: " + message_id;
+                   response.send(result_msg);
+                   console.log(result_msg);
                })
                .catch(function(error) {
                    console.error(func_name,"ERROR ADDING MESSAGE DOC:", error);
