@@ -320,8 +320,8 @@ function AddMessageToConversation(message_id, conversation_id) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Given a message id, receiver and sender, retrieve the correct public keys,
-decrypt and return the plaintext message.
+Given a message id, receiver, receiver's pin and sender, retrieve the correct
+public keys, decrypt and return the plaintext message.
 /////////////////////////////////////////////////////////////////////////////*/
 function getMessage(
     message_id,receiver_id,receiver_pin,sender_id,response) {
@@ -329,23 +329,32 @@ function getMessage(
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
-        var sender_public = doc.data().public_key;
-        // Next get receiver's public key /////////////////////////////////////
+        var sender_stored_pin = doc.data().pin;
+        // Next get receiver's pin ////////////////////////////////////////////
         db.collection('users').doc(receiver_id).get()
         .then(function(doc) {
-            var receiver_public = doc.data().public_key;
-            db.collection('messages').doc(message_id).get()
-            .then(function(doc) {
-                // Decrypt the message ////////////////////////////////////////
-                var msg_encrypted = doc.data().msg_encrypted;
-                var msg_decrypted = aes256.decrypt(
-                    sender_public+receiver_public,msg_encrypted
-                );
-                response.send(msg_decrypted);
-            })
-            .catch(function(error) {
-                console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
-            });;
+            var receiver_stored_pin = doc.data().pin;
+            console.log(func_name,"Receiver's stored pin:",receiver_stored_pin);
+            console.log(func_name,"Receiver's provid pin:",receiver_pin);
+            if(receiver_stored_pin === receiver_pin) {
+                console.log(func_name,"The sender provided the correct pin.")
+                db.collection('messages').doc(message_id).get()
+                .then(function(doc) {
+                    // Decrypt the message ////////////////////////////////////////
+                    var msg_encrypted = doc.data().msg_encrypted;
+                    var msg_decrypted = aes256.decrypt(
+                        sender_stored_pin+receiver_stored_pin,msg_encrypted
+                    );
+                    response.send(msg_decrypted);
+                })
+                .catch(function(error) {
+                    console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
+                });;
+            }
+            else {
+               console.log(func_name,
+                   "The receiver provided an incorrect pin.")
+            }
         })
         .catch(function(error) {
             console.error(func_name,"ERROR GETTING RECEIVER DOC:",error);
