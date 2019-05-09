@@ -90,15 +90,23 @@ app.post('/getmsg', (request, response) => {
     // Collect data from the request //////////////////////////////////////////
     var message_id = request.body.message_id;
     var receiver_id = request.body.receiver_id;
+    var receiver_pin = request.body.pin;
     var sender_id = request.body.sender_id;
-    var result = getMessage(message_id,receiver_id,sender_id,response);
     console.log(
         func_name,"\n",
         "\t","message_id:",message_id,"\n",
         "\t","receiver_id:",receiver_id,"\n",
+        "\t","receiver_pin:",receiver_pin,"\n",
         "\t","sender_id:",sender_id,"\n",
-        "\t","result:",result,"\n",
     );
+    if(receiver_pin != null) {
+        getMessage(message_id,receiver_id,receiver_pin,sender_id,response);
+    }
+    else {
+        var result_msg = func_name + " ERROR: RECEIVER'S PIN REQUIRED";
+        response.send(result_msg);
+        console.log(result_msg);
+    }
 });
 
 
@@ -157,9 +165,9 @@ app.post('/newconvo', (request, response) => {
        });
     }
     else {
-       var result_msg = func_name + " ERROR: SENDER'S PIN REQUIRED";
-       response.send(result_msg);
-       console.log(result_msg);
+        var result_msg = func_name + " ERROR: SENDER'S PIN REQUIRED";
+        response.send(result_msg);
+        console.log(result_msg);
     }
 
 });
@@ -316,7 +324,7 @@ Given a message id, receiver and sender, retrieve the correct public keys,
 decrypt and return the plaintext message.
 /////////////////////////////////////////////////////////////////////////////*/
 function getMessage(
-    message_id,receiver_id,sender_id,response) {
+    message_id,receiver_id,receiver_pin,sender_id,response) {
     var func_name = "getMessage() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
