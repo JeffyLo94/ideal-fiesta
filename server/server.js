@@ -402,7 +402,7 @@ message document.
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(
     conversation_id,msg,receiver_id,sender_id,timestamp) {
-    var func_name = "sendMessager() ->";
+    var func_name = "sendMessage() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
@@ -446,13 +446,12 @@ function sendMessage(
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Given a conversation, plaintext message, receiver, sender and timestamp,
-retrieve the correct public keys, encrypt the message and create the new
-message document.
+Given a conversation, plaintext message, receiver, sender, timestamp and pin,
+verify the correct pin, encrypt the message and create the new message document.
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessageAndPin(
-    conversation_id,msg,receiver_id,sender_id,timestamp,pin) {
-    var func_name = "sendMessager() ->";
+    conversation_id,msg,receiver_id,sender_id,timestamp,sender_provided_pin) {
+    var func_name = "sendMessageAndPin() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
