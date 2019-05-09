@@ -203,21 +203,7 @@ app.post('/setoffline', (request, response) => {
 Send a message
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/sendmsg',(request, response) => {
-    var func_name = "/sendmsg ->";
-    // Capture information from the request ///////////////////////////////////
-    var conversation_id = request.body.conversation_id;
-    var msg = request.body.msg;
-    var receiver_id = request.body.receiver_id;
-    var sender_id = request.body.sender_id;
-    var timestamp = Date.now();
-    // Perform the transaction ////////////////////////////////////////////////
-    sendMessage(
-        conversation_id,
-        msg,
-        receiver_id,
-        sender_id,
-        timestamp
-    );
+    response.send("ERROR: Deprecated. Please use /sendmsgandpin");
 });
 
 
@@ -226,7 +212,7 @@ app.post('/sendmsg',(request, response) => {
 Send a message with t
 /////////////////////////////////////////////////////////////////////////////*/
 app.post('/sendmsgandpin',(request, response) => {
-    var func_name = "/sendmsg ->";
+    var func_name = "/sendmsgandpin ->";
     // Capture information from the request ///////////////////////////////////
     var conversation_id = request.body.conversation_id;
     var msg = request.body.msg;
