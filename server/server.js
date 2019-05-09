@@ -251,7 +251,7 @@ Mark a user online
 app.post('/setonline', (request, response) => {
     console.log("/setonline");
     var uid = request.body.UID;
-    console.log("\tUID: ", uid);
+    console.log("\tuser_id: ", uid);
     var userRef = db.collection('users').doc(uid);
     var updateSingle = userRef.update({online:true});
     response.send("OK");
