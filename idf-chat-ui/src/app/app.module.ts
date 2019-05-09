@@ -82,7 +82,7 @@ let fbconfig = {
     MatListModule,
     MatIconModule,
     MatCardModule,
-    // MatButtonModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatMenuModule,

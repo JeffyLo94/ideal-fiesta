@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HeaderLink, HeaderUser } from './header/header.component';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { BehaviorSubject } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +12,9 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent implements OnInit{
   title = 'idf-chat-ui';
+  loginStatus = false;
+
+  destroy$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   chatLink: HeaderLink = {
     text: 'Chat',
@@ -24,15 +29,31 @@ export class AppComponent implements OnInit{
   }
 
   appLinks = [];
-  currUser: HeaderUser = {
-    avatarUrl: '',
-    name: ''
-  };
+  currUser: HeaderUser;
 
   constructor(private readonly router: Router, private readonly fbAuth: AuthService) {
-    console.log(this.currUser);
+    this.setUserValue();
+    console.log('app-root', this.currUser);
+  }
+
+  ngOnInit() {
+    this.fbAuth.loggedIn$.pipe(
+      takeWhile( () => this.destroy$.value )
+    ).subscribe(
+      (isLogged: boolean) => {
+        console.log('loginStatus triggered: ', isLogged);
+        this.setUserValue();
+      }
+    );
+  }
+
+  setUserValue() {
     if (this.fbAuth.isLoggedIn) {
       const fbUser = this.fbAuth.currentUser;
+      this.currUser = {
+        avatarUrl: '',
+        name: ''
+      };
       this.currUser.name = fbUser.email;
       this.currUser.avatarUrl = '';
       this.appLinks = [this.chatLink];
@@ -40,10 +61,6 @@ export class AppComponent implements OnInit{
       this.appLinks = [this.signUpLink];
       this.currUser = null;
     }
-  }
-
-  ngOnInit() {
-
   }
 
   handleLogin(e) {

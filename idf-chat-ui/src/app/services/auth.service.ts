@@ -3,12 +3,15 @@ import { Router } from '@angular/router';
 import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { User } from 'firebase';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private user: User;
+  private loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loggedIn$ = this.loggedIn.asObservable();
 
 
   constructor(public  fireAuth: AngularFireAuth, public  router: Router) {
@@ -32,7 +35,9 @@ export class AuthService {
 
   async login(email: string, pass: string) {
     try {
+      console.log('fb auth logging in');
       await this.fireAuth.auth.signInWithEmailAndPassword( email, pass );
+      this.loggedIn.next(true);
       this.router.navigate(['chat']);
     } catch (e) {
       alert('Error!' + e.message);
@@ -40,14 +45,18 @@ export class AuthService {
   }
 
   async logout() {
+    console.log('fb auth logging out');
     await this.fireAuth.auth.signOut();
     localStorage.removeItem('user');
+    this.loggedIn.next(false);
     this.router.navigate(['login']);
   }
 
   get isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user'));
-    return user !== null;
+    const status = user !== null;
+    // this.loggedIn.next(status);
+    return status;
   }
 
   get currentUser(): User {

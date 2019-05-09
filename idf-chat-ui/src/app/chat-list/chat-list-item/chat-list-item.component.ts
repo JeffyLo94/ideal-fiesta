@@ -15,14 +15,21 @@ export class ChatListItemComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log('list Item Convo: ', this.convo);
   }
 
   onGetChatTitle() {
-    return 'blah';
+    console.log(`got title ${this.convo.title}`);
+    return this.convo.title;
   }
 
   onGetLastUpdated() {
-    return Date.UTC(2019, 4, 20);
+    console.log(`got title ${this.convo.lastUpdated}`);
+    return this.convo.lastUpdated;
+  }
+
+  onGetStatusColor() {
+    return 'white';
   }
 
 }

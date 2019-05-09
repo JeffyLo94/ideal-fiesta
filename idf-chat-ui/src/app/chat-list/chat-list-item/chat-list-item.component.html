@@ -6,12 +6,11 @@
     (click)="onClickImage()">
 
     <div class="list-item-content">
-      <h3
-        [ngStyle]="{ color: getStatusColor() }">
-        {{ getChatTitle() | uppercase }}
+      <h3>
+        {{ onGetChatTitle() }}
       </h3>
       <div class="list-item-time">
-        <span>{{ getLastUpdated() | date:'yyyy-MM-dd'}}</span>
+        <span>{{ onGetLastUpdated() }}</span>
       </div>
     </div>
 
