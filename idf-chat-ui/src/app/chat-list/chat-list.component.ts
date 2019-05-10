@@ -34,7 +34,7 @@ export class ChatListComponent implements OnInit, OnDestroy {
     id: '123456789',
     title: 'chatconvo1',
     members: ['blah', 'blah2'],
-    messages: [],
+    messages: ['', ''],
     lastUpdated: new Date().getTime(),
     createdOn: new Date().getTime()
   };
