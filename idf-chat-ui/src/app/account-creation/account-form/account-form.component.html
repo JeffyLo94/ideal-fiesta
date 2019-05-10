@@ -23,6 +23,11 @@
                   <mat-icon matSuffix (click)="toggleHide()">{{ isHidden ? 'visibility' : 'visibility_off'}}</mat-icon>
                   <mat-error *ngIf="acctForm.hasError('notSame')">Passwords don't match</mat-error>
               </mat-form-field>
+              <mat-form-field class="formField">
+                    <mat-label>PIN</mat-label>
+                    <input matInput [type]="isHidden ? 'password' : 'text'" formControlName="PIN" placeholder="Enter PIN" name="PIN">
+                    <mat-icon matSuffix (click)="toggleHide()">{{ isHidden ? 'visibility' : 'visibility_off'}}</mat-icon>
+                </mat-form-field>
           </form>
       </mat-card-content>
       <mat-card-actions class="actions">

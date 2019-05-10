@@ -70,6 +70,16 @@ export class AuthService {
     return user;
   }
 
+  public generateAESKeys( uid: string, pin: string ) {
+    const url = 'http://localhost:3000/genPublic';
+    const body = {
+      "user_id": uid,
+      "pin": pin
+    };
+    console.log('generating aes key');
+    this.http.post(url, body, this.options).subscribe();
+  }
+
   private setOnline( uid: string ) {
     const url = 'http://localhost:3000/setonline';
     const body = {

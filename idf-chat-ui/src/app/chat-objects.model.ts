@@ -3,10 +3,10 @@ export interface User {
   email: string;
   pass: string;
   uid: string;
-  publicKey: string;
+  public_key: string;
   username: string;
-  ePrivateKey: string;
   online: boolean;
+  pin: string;
   conversations: string[];    // array of conversation IDs
 }
 

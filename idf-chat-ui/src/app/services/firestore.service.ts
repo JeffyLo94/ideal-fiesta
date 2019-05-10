@@ -16,7 +16,7 @@ export class FirestoreService {
 
   createUser(user: User) {
     console.log('fs creating Users');
-    return this.fs.collection('users').add(user);
+    return this.fs.collection('users').doc(user.id).set(user);
   }
 
   updateUser(user: User) {
@@ -50,5 +50,10 @@ export class FirestoreService {
 
   deleteConversation(convoId: string) {
     this.fs.doc('conversation/' + convoId).delete();
+  }
+
+  getMessage( msgID: string ) {
+    console.log('fs getting msgid - ', msgID);
+    return this.fs.collection('messages').doc(msgID).valueChanges();
   }
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Convos } from 'src/app/chat-objects.model';
 import { ChatsService } from 'src/app/services/chats.service';
+import { FirestoreService } from 'src/app/services/firestore.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat-list-item',
@@ -13,7 +15,7 @@ export class ChatListItemComponent implements OnInit {
   newItem = true;
   oldItem = false;
 
-  constructor(private readonly chats: ChatsService) { }
+  constructor(private readonly chats: ChatsService, private readonly fs: FirestoreService) { }
 
   ngOnInit() {
     console.log('list Item Convo: ', this.convo);
@@ -36,6 +38,20 @@ export class ChatListItemComponent implements OnInit {
   onItemClicked() {
     console.log(`chat id: ${this.convo.id} clicked`);
     this.chats.setFocusedConvo(this.convo.id);
+    // if (this.convo.messages) {
+    //   console.log(`Message IDs: ${this.convo.messages}`);
+    //   this.convo.messages.forEach(
+    //     (val, ind, arr) => {
+    //       this.fs.getMessage(val).pipe(
+    //         map( () => {
+
+    //         })
+    //       ).subscribe();
+
+    //     }
+    //   )
+    // }
+    // this.fs.getMessage(this.)
   }
 
 }

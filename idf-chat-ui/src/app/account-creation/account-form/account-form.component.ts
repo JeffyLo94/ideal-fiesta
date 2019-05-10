@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormGroupDirective, NgForm, FormBuilder, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
 import { User } from 'src/app/chat-objects.model';
+import { AuthService } from 'src/app/services/auth.service';
+import { FirestoreService } from 'src/app/services/firestore.service';
+import { Router } from '@angular/router';
 
 export class PasswordErrSM implements ErrorStateMatcher {
   isErrorState( control: FormControl | null, form: FormGroupDirective | NgForm |null): boolean {
@@ -24,12 +27,16 @@ export class AccountFormComponent implements OnInit {
   user: User;
   isHidden: boolean = true;
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder,
+              private fa: AuthService,
+              private fs: FirestoreService,
+              private router: Router) {
     this.acctForm = this.formBuilder.group({
       email: [''],
       username: [''],
       password: ['', [Validators.required]],
-      confirmPassword: ['']
+      confirmPassword: [''],
+      PIN: ['']
     }, { validator: this.checkPasswords });
   }
 
@@ -56,5 +63,31 @@ export class AccountFormComponent implements OnInit {
     password: ${this.acctForm.get('password').value}
     confirmPassword: ${this.acctForm.get('confirmPassword').value}
     `);
+    this.fa.signUp(this.acctForm.get('email').value, this.acctForm.get('password').value).then(
+      () => {
+        let newid = this.fa.currentUser.uid;
+        let newpin = this.acctForm.get('PIN').value;
+        let newUser: User = {
+          id: newid,
+          uid: newid,
+          email: this.acctForm.get('email').value,
+          pass: this.acctForm.get('password').value,
+          username: this.acctForm.get('username').value,
+          online: false,
+          conversations: [],
+          public_key: '',
+          pin: newpin
+        };
+
+        this.fs.createUser(newUser).then(
+          () => {
+            this.fa.generateAESKeys( newid, newpin );
+          }
+        );
+        console.log('new user attempted to be created');
+        this.router.navigate(['login']);
+
+      }
+    );
   }
 }
