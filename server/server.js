@@ -92,15 +92,23 @@ app.post('/getmsg', (request, response) => {
     // Collect data from the request //////////////////////////////////////////
     var message_id = request.body.message_id;
     var receiver_id = request.body.receiver_id;
+    var receiver_pin = request.body.pin;
     var sender_id = request.body.sender_id;
-    var result = getMessage(message_id,receiver_id,sender_id,response);
     console.log(
         func_name,"\n",
         "\t","message_id:",message_id,"\n",
         "\t","receiver_id:",receiver_id,"\n",
+        "\t","receiver_pin:",receiver_pin,"\n",
         "\t","sender_id:",sender_id,"\n",
-        "\t","result:",result,"\n",
     );
+    if(receiver_pin != null) {
+        getMessage(message_id,receiver_id,receiver_pin,sender_id,response);
+    }
+    else {
+        var result_msg = func_name + " ERROR: RECEIVER'S PIN REQUIRED";
+        response.send(result_msg);
+        console.log(result_msg);
+    }
 });
 
 
@@ -142,7 +150,7 @@ app.post('/newconvo', (request, response) => {
                then(function(doc) {
                    var receiver_id = doc.id;
                    AddConversationToUser(conversation_id,receiver_id);
-                   sendMessageAndPin(
+                   sendMessage(
                        conversation_id,
                        msg,
                        receiver_id,
@@ -157,12 +165,11 @@ app.post('/newconvo', (request, response) => {
        .catch(function(error) {
            console.error(func_name,"-> ERROR:", error);
        });
-       response.send(conversation_id);
     }
     else {
-       var result_msg = func_name + " ERROR: SENDER'S PIN REQUIRED";
-       response.send(result_msg);
-       console.log(result_msg);
+        var result_msg = func_name + " ERROR: SENDER'S PIN REQUIRED";
+        response.send(result_msg);
+        console.log(result_msg);
     }
 
 });
@@ -235,7 +242,7 @@ app.post('/sendmsgandpin',(request, response) => {
     var timestamp = Date.now();
     var pin = request.body.pin;
     // Perform the transaction ////////////////////////////////////////////////
-    sendMessageAndPin(
+    sendMessage(
         conversation_id,
         msg,
         receiver_id,
@@ -254,31 +261,10 @@ Mark a user online
 app.post('/setonline', (request, response) => {
     console.log("/setonline");
     var uid = request.body.UID;
-    console.log("\tUID: ", uid);
+    console.log("\tuser_id: ", uid);
     var userRef = db.collection('users').doc(uid);
     var updateSingle = userRef.update({online:true});
     response.send("OK");
-});
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-testaes
-/////////////////////////////////////////////////////////////////////////////*/
-app.post('/testaes', (request, response) => {
-    var plain1 = "My text";
-    var pin1 = "12345";
-    var encrypt1 = aes256.encrypt(pin1,plain1);
-
-    var plain2 = "My text";
-    var pin2 = "12345";
-    var encrypt2 = aes256.encrypt(pin2,plain2);
-
-    console.log(encrypt1);
-    console.log(encrypt2);
-
-    var decrypt1 = aes256.decrypt(pin1,encrypt1);
-    console.log(decrypt1);
 });
 
 
@@ -336,32 +322,41 @@ function AddMessageToConversation(message_id, conversation_id) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Given a message id, receiver and sender, retrieve the correct public keys,
-decrypt and return the plaintext message.
+Given a message id, receiver, receiver's pin and sender, retrieve the correct
+public keys, decrypt and return the plaintext message.
 /////////////////////////////////////////////////////////////////////////////*/
 function getMessage(
-    message_id,receiver_id,sender_id,response) {
+    message_id,receiver_id,receiver_pin,sender_id,response) {
     var func_name = "getMessage() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
-        var sender_public = doc.data().public_key;
-        // Next get receiver's public key /////////////////////////////////////
+        var sender_stored_pin = doc.data().pin;
+        // Next get receiver's pin ////////////////////////////////////////////
         db.collection('users').doc(receiver_id).get()
         .then(function(doc) {
-            var receiver_public = doc.data().public_key;
-            db.collection('messages').doc(message_id).get()
-            .then(function(doc) {
-                // Decrypt the message ////////////////////////////////////////////
-                var msg_encrypted = doc.data().msg_encrypted;
-                var msg_decrypted = aes256.decrypt(
-                    sender_public+receiver_public,msg_encrypted
-                );
-                response.send(msg_decrypted);
-            })
-            .catch(function(error) {
-                console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
-            });;
+            var receiver_stored_pin = doc.data().pin;
+            console.log(func_name,"Receiver's stored pin:",receiver_stored_pin);
+            console.log(func_name,"Receiver's provid pin:",receiver_pin);
+            if(receiver_stored_pin === receiver_pin) {
+                console.log(func_name,"The sender provided the correct pin.")
+                db.collection('messages').doc(message_id).get()
+                .then(function(doc) {
+                    // Decrypt the message ////////////////////////////////////////
+                    var msg_encrypted = doc.data().msg_encrypted;
+                    var msg_decrypted = aes256.decrypt(
+                        sender_stored_pin+receiver_stored_pin,msg_encrypted
+                    );
+                    response.send(msg_decrypted);
+                })
+                .catch(function(error) {
+                    console.error(func_name,"ERROR GETTING MESSAGE DOC:",error);
+                });;
+            }
+            else {
+               console.log(func_name,
+                   "The receiver provided an incorrect pin.")
+            }
         })
         .catch(function(error) {
             console.error(func_name,"ERROR GETTING RECEIVER DOC:",error);
@@ -397,69 +392,19 @@ function getPublic(user_id) {
 
 
 /*/////////////////////////////////////////////////////////////////////////////
-Given a conversation, plaintext message, receiver, sender and timestamp,
-retrieve the correct public keys, encrypt the message and create the new
-message document.
+Given a conversation, plaintext message, receiver, sender, timestamp and pin,
+verify the correct pin, encrypt the message and create the new message document.
 /////////////////////////////////////////////////////////////////////////////*/
 function sendMessage(
-    conversation_id,msg,receiver_id,sender_id,timestamp) {
+    conversation_id,msg,receiver_id,sender_id,
+    timestamp,sender_provided_pin,response) {
     var func_name = "sendMessage() ->";
     // First get sender's public key //////////////////////////////////////////
     db.collection('users').doc(sender_id).get()
     .then(function(doc) {
-        var sender_public = doc.data().public_key;
-        // Next get receiver's public key /////////////////////////////////////
-        db.collection('users').doc(receiver_id).get()
-        .then(function(doc) {
-            var receiver_public = doc.data().public_key;
-            // Encrypt the message ////////////////////////////////////////////
-            var msg_encrypted = aes256.encrypt(
-                sender_public+receiver_public,msg
-            );
-            // Now finally send the message ///////////////////////////////////
-            db.collection('messages').add({
-                conversation_id:conversation_id,
-                msg_encrypted:msg_encrypted,
-                receiver_id:receiver_id,
-                receiver_read:false,
-                sender_id:sender_id,
-                timestamp:timestamp
-            })
-            .then(function(docRef) {
-                var message_id = docRef.id;
-                console.log(func_name,"SUCCESS: ID:", message_id);
-                // Add the new message's id into the conversation it belongs to
-                AddMessageToConversation(message_id,conversation_id);
-            })
-            .catch(function(error) {
-                console.error(func_name,"ERROR ADDING MESSAGE DOC:", error);
-            });
-        })
-        .catch(function(error) {
-            console.error(func_name,"ERROR GETTING RECEIVER DOC:",error);
-        });;
-    })
-    .catch(function(error) {
-        console.error(func_name,"ERROR GETTING SENDER DOC:",error);
-    });;
-}
-
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-Given a conversation, plaintext message, receiver, sender, timestamp and pin,
-verify the correct pin, encrypt the message and create the new message document.
-/////////////////////////////////////////////////////////////////////////////*/
-function sendMessageAndPin(
-    conversation_id,msg,receiver_id,sender_id,
-    timestamp,sender_provided_pin,response) {
-    var func_name = "sendMessageAndPin() ->";
-    // First get sender's public key //////////////////////////////////////////
-    db.collection('users').doc(sender_id).get()
-    .then(function(doc) {
         var sender_stored_pin = doc.data().pin;
-        console.log("Sender's stored pin:",sender_stored_pin);
-        console.log("Sender's provid pin:",sender_provided_pin);
+        console.log(func_name,"Sender's stored pin:",sender_stored_pin);
+        console.log(func_name,"Sender's provid pin:",sender_provided_pin);
         if(sender_stored_pin === sender_provided_pin) {
            console.log(func_name,"The sender provided the correct pin.")
            // Next get receiver's pin /////////////////////////////////////////
@@ -483,7 +428,9 @@ function sendMessageAndPin(
                    var message_id = docRef.id;
                    // Record the new id into the correct conversation /////////
                    AddMessageToConversation(message_id,conversation_id);
-                   var result_msg = func_name + " SUCCESS: ID: " + message_id;
+                   var result_msg = func_name + " SUCCESS: MESSAGE: " +
+                       message_id + " POSTED TO CONVERSATION: "
+                       + conversation_id;
                    response.send(result_msg);
                    console.log(result_msg);
                })
