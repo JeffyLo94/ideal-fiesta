@@ -51,8 +51,8 @@ export class AuthService {
 
   async logout() {
     console.log('fb auth logging out');
-    await this.fireAuth.auth.signOut();
     this.setOffline(this.currentUser.uid);
+    await this.fireAuth.auth.signOut();
     localStorage.removeItem('user');
     this.loggedIn.next(false);
     this.router.navigate(['login']);
@@ -70,7 +70,7 @@ export class AuthService {
     return user;
   }
 
-  private setOnline( uid ) {
+  private setOnline( uid: string ) {
     const url = 'http://localhost:3000/setonline';
     const body = {
       "UID": uid
@@ -79,7 +79,7 @@ export class AuthService {
     this.http.post(url, body, this.options).subscribe();
   }
 
-  private setOffline( uid ) {
+  private setOffline( uid: string ) {
     const url = 'http://localhost:3000/setoffline';
     const body = {
       "UID": uid
