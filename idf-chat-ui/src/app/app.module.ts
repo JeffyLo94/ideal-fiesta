@@ -40,6 +40,8 @@ import { ChatListItemComponent } from './chat-list/chat-list-item/chat-list-item
 import { ReversePipe } from './pipes/reverse.pipe';
 import { AccountCreationComponent } from './account-creation/account-creation.component';
 import { AccountFormComponent } from './account-creation/account-form/account-form.component';
+import { HttpClientModule } from '@angular/common/http';
+import { OnlineListComponent } from './online-list/online-list.component';
 
 
 let fbconfig = {
@@ -67,7 +69,8 @@ let fbconfig = {
     ChatListItemComponent,
     ReversePipe,
     AccountCreationComponent,
-    AccountFormComponent
+    AccountFormComponent,
+    OnlineListComponent
   ],
   imports: [
     AngularFireModule.initializeApp(fbconfig),
@@ -76,6 +79,7 @@ let fbconfig = {
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    HttpClientModule,
     AppRoutingModule,
     FlexLayoutModule,
     MatToolbarModule,
@@ -88,7 +92,7 @@ let fbconfig = {
     MatMenuModule,
     ReactiveFormsModule
   ],
-  providers: [],
+  providers: [AngularFirestore],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -26,6 +26,8 @@ Express server creation, setup & startup
 /////////////////////////////////////////////////////////////////////////////*/
 const app = express()
 app.use(bodyParser.json());
+app.use(cors());
+app.options('*', cors());
 app.listen(port, () => console.log(
     `IdealFiesta Chat is running at localhost:${port}`));
 

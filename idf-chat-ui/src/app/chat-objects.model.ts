@@ -13,7 +13,7 @@ export interface User {
 export interface Message {
   message: string;
   timestamp: Date;
-sender: string;               // UID of sender
+  sender: string;               // UID of sender
   messageHash: string;
 }
 

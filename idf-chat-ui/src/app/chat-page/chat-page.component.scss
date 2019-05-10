@@ -1,13 +1,13 @@
 .tempTop {
-  min-height: 80%;
+  min-height: 50%;
   width: 100%;
   /* background-color: #555; */
   display: flex;
-  align-items: center;
+  // align-items: center;
 }
 
 .tempBottom {
-	max-height: 10%;
+	max-height: 50%;
 }
 
 .tempHolder {
@@ -18,4 +18,8 @@
 
 .pane-left {
   width: 100%;
+}
+
+.chatlist {
+  width: inherit;
 }

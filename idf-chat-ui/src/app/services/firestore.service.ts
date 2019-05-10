@@ -27,4 +27,28 @@ export class FirestoreService {
   deleteUser(userId: string) {
     this.fs.doc('user/' + userId).delete();
   }
+
+  getConversations() {
+    console.log('fs getting conversations');
+    return this.fs.collection('conversations').snapshotChanges();
+  }
+
+  getConversation( convoId: string ) {
+    console.log('fs getting convo - ', convoId);
+    return this.fs.collection('conversations').doc(convoId).valueChanges();
+  }
+
+  createConversation(convo: Convos) {
+    console.log('fs creating convo');
+    return this.fs.collection('conversations').add(convo);
+  }
+
+  updateConversation(convo: Convos) {
+    delete convo.id;
+    this.fs.doc('conversation/' + convo.id).update(convo);
+  }
+
+  deleteConversation(convoId: string) {
+    this.fs.doc('conversation/' + convoId).delete();
+  }
 }

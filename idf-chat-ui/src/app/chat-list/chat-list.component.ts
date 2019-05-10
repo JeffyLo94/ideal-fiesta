@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject, BehaviorSubject, Subscription } from 'rxjs';
 import { Convos, EEncryptedMessage } from '../chat-objects.model';
+import { ChatsService } from '../services/chats.service';
+import { takeWhile, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat-list',
   templateUrl: './chat-list.component.html',
   styleUrls: ['./chat-list.component.scss']
 })
-export class ChatListComponent implements OnInit {
+export class ChatListComponent implements OnInit, OnDestroy {
 
-  private readonly destroy$: Subject<boolean> = new Subject<boolean>();
+  private readonly destroy$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   private exMessMap = new Map<string, EEncryptedMessage[]>([
     [
@@ -36,13 +38,43 @@ export class ChatListComponent implements OnInit {
     lastUpdated: new Date().getTime(),
     createdOn: new Date().getTime()
   };
-
+  private convoSub: Subscription;
   convos: Convos[] = [];
+  convosIds: string[] = [];
 
-  constructor() { }
+  constructor(private readonly chats: ChatsService) { }
 
   ngOnInit() {
-    this.populateWithExample();
+    // this.populateWithExample();
+    this.chats.convoMap$.pipe(
+      // takeWhile( () => this.destroy$.value ),
+      tap( () => {
+        console.log('anyupdates?');
+      })
+    ).subscribe(
+      (convoMap: Map<string, Convos>) => {
+        console.log(`convo map: ${JSON.stringify(convoMap)}`);
+        convoMap.forEach( (obj, id, dict) => {
+          obj.id = id;
+          if ( this.convosIds.includes(id) ){
+            // convo already exists in array
+            console.log(`convo ${id} updated`);
+            const ind = this.convosIds.indexOf(id);
+            this.convos[ind] = obj;
+          } else {
+            // new convo
+            console.log(`convo ${id} added`);
+            this.convosIds.push(id);
+            this.convos.push(obj);
+          }
+        });
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(false);
+    this.destroy$.complete();
   }
 
   populateWithExample() {

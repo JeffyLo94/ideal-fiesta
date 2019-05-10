@@ -1,0 +1,9 @@
+<div class="onlineList">
+  <div class="onlineListHeader">Users Online</div>
+  <div class="UserList" *ngFor="let user of onlineUsers">
+    <div class="userItem">
+      <mat-icon class="material-icons">account_circle_outline</mat-icon>
+      <span class="username">{{user.email}}</span>
+    </div>
+  </div>
+</div>

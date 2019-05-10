@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Message } from 'src/app/chat-objects.model';
 
 @Component({
   selector: 'app-chat-messages-view',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ChatMessagesViewComponent implements OnInit {
 
+  @Input() messages: Message[];
+
   constructor() { }
 
   ngOnInit() {
   }
 
+  getMessageFrom( msg ) {
+    return 'placeholder';
+  }
+
+  getAuthorFrom( msg ) {
+    return 'placeholder';
+  }
 }

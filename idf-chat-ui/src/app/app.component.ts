@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
+import { ChatsService } from './services/chats.service';
+import { FirestoreService } from './services/firestore.service';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +33,9 @@ export class AppComponent implements OnInit{
   appLinks = [];
   currUser: HeaderUser;
 
-  constructor(private readonly router: Router, private readonly fbAuth: AuthService) {
+  constructor(private readonly router: Router,
+              private readonly fbAuth: AuthService,
+              private readonly chats: ChatsService) {
     this.setUserValue();
     console.log('app-root', this.currUser);
   }

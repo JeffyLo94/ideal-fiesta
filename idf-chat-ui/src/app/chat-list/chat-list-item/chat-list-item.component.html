@@ -1,17 +1,10 @@
-<div
-  class="outer">
-  <div
-    [ngClass]="{ 'new-item': newItem, 'old-item': oldItem }"
-    class="list-item"
-    (click)="onClickImage()">
-
+<div class="outer">
+  <div class="list-item" (click)="onItemClicked()">
     <div class="list-item-content">
-      <h3>
-        {{ onGetChatTitle() }}
-      </h3>
-      <div class="list-item-time">
+      <h3> {{ onGetChatTitle() }} </h3>
+      <!-- <div class="list-item-time">
         <span>{{ onGetLastUpdated() }}</span>
-      </div>
+      </div> -->
     </div>
 
   </div>

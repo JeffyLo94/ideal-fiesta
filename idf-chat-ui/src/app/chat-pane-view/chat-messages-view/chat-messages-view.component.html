@@ -1,3 +1,6 @@
-<p>
-  chat-messages-view works!
-</p>
+<div class="messagesHolder" *ngFor="let message of messages">
+  <div class="messageBox">
+    <span>{{getTitleFrom(message)}}</span>
+    <span>{{getMessageFrom(message)}}</span>
+  </div>
+</div>

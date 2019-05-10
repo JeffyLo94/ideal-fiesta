@@ -1,6 +1,8 @@
+@import 'variables';
+
 .scrollbar {
   width: inherit;
-  height: 70vh;
+  height: 50vh;
   background-color: #282828;
   overflow-y: auto;
 }
@@ -22,4 +24,21 @@
   box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
   background-color: #555;
+}
+
+.listStyle {
+  width: inherit;
+}
+
+.listItem {
+  width: inherit;
+  border-bottom: 1px solid #404040;
+}
+
+.listHeader {
+  width: 100%;
+  text-align: center;
+  background-color: #4caf50;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

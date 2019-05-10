@@ -1,11 +1,12 @@
 .outer {
   display: flex;
   justify-content: center;
+  width: inherit;
 }
 
 .list-item {
-  height: 130px;
-  width: 550px;
+  height: 75px;
+  width: inherit;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -16,9 +17,9 @@
   margin: 0 5px 5px 5px;
 }
 
-.list-item > * {
-  margin: 0 5px;
-}
+// .list-item > * {
+//   margin: 0 5px;
+// }
 
 .new-item {
   box-shadow: inset 0px 0px 5px 5px rgba(8, 156, 15, 0.8);
@@ -41,8 +42,9 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  width: 220px;
-  float: right;
+  width: inherit;
+  // float: right;
+  margin: auto;
 }
 
 .list-item-time {
